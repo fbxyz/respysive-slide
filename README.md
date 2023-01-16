@@ -193,6 +193,7 @@ html = presentation.render_presentation(theme='moon')
 with open("presentation.html", "w") as f:
     f.write(html)
 ```
+And the output : [readme_example.html](https://raw.githack.com/fbxyz/respysive-slide/master/readme_example.html)
 
 ### Presentation rendering with nbconvert
 Alternatively, nbconvert can be used to generate the slides using `from IPython.display import HTML` : 
@@ -213,6 +214,4 @@ HTML(sld_title.render())
 Like reveals.js, just add `?print-pdf` after your url (.i.e /presentation.html?print-pdf). 
 Then print the results with your brother
 
-The best results are obtained with chrome... 
-# respysive-slide
-# respysive-slide
+The best results are obtained with chrome...
