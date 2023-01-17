@@ -5,12 +5,19 @@ using Python, Bootstrap and Reveal.js.
 
 ___
 ## Installation
-You can clone this repo or : 
+With PyPI 
 ```
-pip install respysive_slide
+pip install respysive-slide
+```
+In case of error : 
+`ERROR: No matching distribution found for soupsieve>=2.3.2`
+be sure to install beautifulsoup4 before respysive_slide : 
+```
+pip install beautifulsoup4 respysive-slide
 ```
 
-`#TODO : add conda package`
+You can also clone the [repo](https://github.com/fbxyz/respysive-slide) and import respysive as a module
+
 ___
 ## Usage
 
