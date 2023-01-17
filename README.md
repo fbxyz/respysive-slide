@@ -3,18 +3,16 @@ ___
 A Python package that allows you to create interactive presentations using Python, Bootstrap and Reveal.js. 
 Charts from Altair and Plotly can also be added.
 
+You will find an [example here](https://raw.githack.com/fbxyz/respysive-slide/master/readme_example.html)
+
+
 ___
 ## Installation
 With PyPI 
 ```
 pip install respysive-slide
 ```
-In case of error : 
-`ERROR: No matching distribution found for soupsieve>=2.3.2`
-be sure to install beautifulsoup4 before respysive_slide : 
-```
-pip install beautifulsoup4 respysive-slide
-```
+
 
 You can also clone the [repo](https://github.com/fbxyz/respysive-slide) and import respysive as a module
 
@@ -57,6 +55,9 @@ with sld_title:
 ```
 ![sld_title.png](assets%2Fimg%2Fsld_title.png)
 
+Another solution is to create manually 3 rows : 
+- two of one column of width 12
+- one row of two columns of width 6 
 
 ### One column text slide
 Next, we create a new Container instance `sld_content_1col` : 
@@ -214,6 +215,8 @@ with sld_content_altair:
 ![sld_content_plotly.png](assets%2Fimg%2Fsld_content_plotly.png)
 ![sld_content_altair.png](assets%2Fimg%2Fsld_content_altair.png)
 
+As you can see, despite the Plotly and Altair are the same width (900), output are not... 
+
 ###  Centered subtitle
 A simple slide with a unique centered subtitle :
 ```python
@@ -280,6 +283,7 @@ HTML(sld_title.render())
 
 `#TODO : add an ipynb example`
 
+___
 ## PDF export
 Like reveals.js, just add `?print-pdf` after your url (.i.e /presentation.html?print-pdf). 
 Then print the results with your brother
