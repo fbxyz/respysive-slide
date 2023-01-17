@@ -7,11 +7,10 @@ sld_title = Container()
 with sld_title:
     title_page = Content()
     title_page.add_title_page(
-        title="My title",
-        subtitle="My subtitle",
+        title="Your title",
+        subtitle="Your subtitle",
         authors=["Author 1", "Author 2", "Author 3"],
-        logo="https://upload.wikimedia.org/wikipedia/fr/2/2c/Universit%C3%A9_Panth%C3%A9on-Sorbonne_"
-             "%28depuis_janvier_2015%29.svg",
+        logo="""https://raw.githubusercontent.com/fbxyz/pratik/main/Logo.png""",
     )
     # add the HTML render to a Bootstrap column of width 12
     sld_title.add_col(title_page.render(), "col-sm-12")
@@ -23,7 +22,7 @@ sld_content_1col = Container()
 with sld_content_1col:
     title = Content()
     title.add_heading(
-        text="My slide title",
+        text="Your slide title",
         tag="h2",
         icon="fas fa-users",
         color="#f1faee",
@@ -78,7 +77,7 @@ sld_content_images = Container()
 with sld_content_images:
     title = Content()
     title.add_heading(
-        text="My slide title",
+        text="Your slide title",
         tag="h2",
     )
     sld_content_images.add_col(title.render(), "col-sm-12")
@@ -102,13 +101,54 @@ with sld_content_images:
     lst.add_list(list_items, ordered=True)
     sld_content_images.add_col(lst.render(), "col-sm-7")
 
-# Create a last slide with an unique subtitle
+# A simple Plotly chart
+import plotly.express as px
+
+df = px.data.iris()
+fig = px.scatter(df, x="sepal_width", y="sepal_length",
+                 color="species", size="petal_length", hover_data=["petal_width"])
+
+fig.update_layout(autosize=False, width=900, height=500)
+
+sld_content_plotly = Container()
+with sld_content_plotly:
+    chart_p = Content()
+    chart_p.add_heading(text="Plotly example", tag="h2", )
+    j = fig.to_json()
+    chart_p.add_plotly(json=j)
+    sld_content_plotly.add_col(chart_p.render(), "col-sm-12")
+
+# A simple Altair chart
+import altair as alt
+
+source = px.data.iris()
+
+chart = (
+    alt.Chart(source)
+    .mark_circle(size=60)
+    .encode(
+        x="sepal_width", y="sepal_length", color="species",
+        tooltip=["species", "sepal_length", "sepal_width"],
+    )
+    .interactive()
+    .properties(width=900, height=500)
+)
+
+sld_content_altair = Container()
+with sld_content_altair:
+    chart_a = Content()
+    chart_a.add_heading(text="Altair example", tag="h2", )
+    j = chart.to_json()
+    chart_a.add_altair(json=j)
+    sld_content_altair.add_col(chart_a.render(), "col-sm-12")
+
+# Create a simple slide with a center subtitle
 sld_subtitle = Container()
 
 with sld_subtitle:
     subtitle_page = Content()
     subtitle_page.add_subtitle(
-        text="My subtitle",
+        text="A center subtitle",
         icon="fa fa-check",
         font_size="6rem",
         color="#e63946",
@@ -125,6 +165,8 @@ presentation.add_slide(sld_title)
 presentation.add_slide(sld_content_1col)
 presentation.add_slide(sld_content_2cols)
 presentation.add_slide(sld_content_images)
+presentation.add_slide(sld_content_plotly)
+presentation.add_slide(sld_content_altair)
 presentation.add_slide(sld_subtitle)
 
 # Render the presentation as an HTML file. You can pass the reveal.js theme

@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-
+import uuid
 
 class Content:
     def __init__(self):
@@ -47,7 +47,7 @@ class Content:
 
         self.content += "</div>"
         if subtitle:
-            self.content += "<div class='col-12'>"
+            self.content += "<div class='col-12' style='margin-top:120px;'>"
             if subtitle_color:
                 self.add_heading(subtitle, tag="h2", text_align="center", font_size="2rem", color=subtitle_color)
             else:
@@ -57,10 +57,10 @@ class Content:
         self.content += "</div>"
 
         if authors or logo:
-            self.content += "<div class='row h-100 d-flex align-items-center'>"
+            self.content += "<div class='row h-100 d-flex align-items-end'>"
             if authors:
                 author_str = ", ".join(authors)
-                self.content += "<div class='col-6'>"
+                self.content += "<div class='col-8 pull-left'>"
 
                 if authors_colors:
                     self.add_text(author_str, tag="p", text_align="left", font_size="1rem", color=authors_colors)
@@ -69,7 +69,7 @@ class Content:
 
                 self.content += "</div>"
             if logo:
-                self.content += "<div class='col-6'>"
+                self.content += "<div class='col-4 img-responsive pull-right'>"
                 self.add_image(logo)
                 self.content += "</div>"
             self.content += "</div>"
@@ -118,9 +118,9 @@ class Content:
             css_key = key.replace("_", "-")
             style_str += f"{css_key}: {value};"
         self.content += (
-            f"<{tag} style='margin-bottom: {margin_bottom}; {style_str}'><i class='{icon}'></i> {text}</{tag}>"
+            f"<{tag} style='margin-top-bottom: {margin_bottom}; {style_str}'><i class='{icon}'></i> {text}</{tag}>"
             if icon
-            else f"<{tag} style='margin-bottom: {margin_bottom}; {style_str}'>{text}</{tag}>"
+            else f"<{tag} style='margin-top-bottom: {margin_bottom}; {style_str}'>{text}</{tag}>"
         )
 
     def add_text(self, text: str, tag: str = "p", font_size="calc(1vw + 1vh)", **kwargs):
@@ -141,7 +141,7 @@ class Content:
         self.content += f"<{tag} style='font-size:{font_size}; {style_str}'>{text}</{tag}>"
 
     def add_list(
-            self, items: list, ordered=False, font_size="calc(1vw + 1vh)", **kwargs
+            self, items: list, ordered=False, font_size="1rem", **kwargs
     ):
         """
         Add a list element to the HTML document.
@@ -177,7 +177,7 @@ class Content:
 
     def add_svg(self, svg_code: str, width: str = None, height: str = None, **kwargs):
         """
-        Add an svg to the document.
+        Add a svg to the document.
 
         :param svg_code : The code of the svg.
         :param width : The width of the svg.
@@ -193,6 +193,31 @@ class Content:
             style_str += f"{css_key}: {value};"
         self.content += f"""<svg {width_str} {height_str} class='img-fluid' style='{style_str}'>{svg_code}</svg>"""
 
+    def add_plotly(self, json: str):
+        """
+        Add a plotly json to the document.
+
+        :param json : a plotly json (fig.to_json()).
+
+        """
+        chart_id = "chart-" + str(uuid.uuid4())
+        self.content += f"""<div id='{chart_id}'></div>
+            <script>var Plotjson = '{json}';
+            var figure = JSON.parse(Plotjson);
+            Plotly.newPlot('{chart_id}', figure.data, figure.layout);</script>"""
+
+    def add_altair(self, json: str):
+        """
+        Add an Altair json to the document.
+
+        :param json : an Altair json (chart.to_json()).
+
+        """
+        chart_id = "chart-" + str(uuid.uuid4())
+        self.content += f"""<div id='{chart_id}'></div>
+        <script>var opt = {{renderer: "svg"}};
+        vegaEmbed("#{chart_id}", {json} , opt);</script>"""
+
     def render(self):
         """
         Return the complete HTML document as a string.
@@ -201,3 +226,4 @@ class Content:
         soup = BeautifulSoup(html, "html.parser")
         ident_content = soup.prettify()
         return ident_content
+

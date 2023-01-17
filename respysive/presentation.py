@@ -32,6 +32,16 @@ class Presentation:
             """<script src=https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.min.js></script>""",
             "html.parser")
 
+        plotly_js = BeautifulSoup(
+            """<script src="https://cdn.plot.ly/plotly-2.17.1.min.js"></script>""", "html.parser"
+        )
+
+        altair_js = BeautifulSoup(
+            """<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>""",
+            "html.parser")
+
         bootstrap_css = BeautifulSoup(
             "<link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css'>",
             "html.parser")
@@ -58,6 +68,8 @@ class Presentation:
         head.append(revealtheme_css)
         head.append(bootstrap_css)
         head.append(fontawesome_css)
+        head.append(altair_js)
+        head.append(plotly_js)
 
         body = soup.body
         body.append(bootstrap_correction)

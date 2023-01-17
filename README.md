@@ -47,10 +47,10 @@ sld_title = Container()
 with sld_title:
     title_page = Content()
     title_page.add_title_page(
-        title="My title",
-        subtitle="My subtitle",
+        title="Your title",
+        subtitle="Your subtitle",
         authors=["Author 1", "Author 2", "Author 3"],
-        logo="https://upload.wikimedia.org/wikipedia/fr/2/2c/Universit%C3%A9_Panth%C3%A9on-Sorbonne_%28depuis_janvier_2015%29.svg",
+        logo="""https://raw.githubusercontent.com/fbxyz/pratik/main/Logo.png""",
     )
     # add the HTML render to a Bootstrap column of width 12
     sld_title.add_col(title_page.render(), "col-sm-12")
@@ -68,7 +68,7 @@ Note that most of `Content` methods accept **kwargs for css style. Just replace 
 
 Also, Fontawesome icons can be added in heading.
 
- ```python   
+ ```python
 # Create a new slide with only 1 column
 sld_content_1col = Container()
 
@@ -76,7 +76,7 @@ sld_content_1col = Container()
 with sld_content_1col:
     title = Content()
     title.add_heading(
-        text="My slide title",
+        text="Your slide title",
         tag="h2",
         icon="fas fa-users",
         color="#f1faee",
@@ -132,7 +132,7 @@ sld_content_images = Container()
 with sld_content_images:
     title = Content()
     title.add_heading(
-        text="My slide title",
+        text="Your slide title",
         tag="h2",
     )
     sld_content_images.add_col(title.render(), "col-sm-12")
@@ -157,7 +157,7 @@ with sld_content_images:
     sld_content_images.add_col(lst.render(), "col-sm-7")
 ```
 ###  Centered subtitle
-And a last slide with a unique centered subtitle :
+A simple slide with a unique centered subtitle :
 ```python
 # Create a last slide with an unique subtitle
 sld_subtitle = Container()
@@ -165,7 +165,7 @@ sld_subtitle = Container()
 with sld_subtitle:
     subtitle_page = Content()
     subtitle_page.add_subtitle(
-        text="My subtitle",
+        text="A center subtitle",
         icon="fa fa-check",
         font_size="6rem",
         color="#e63946",
@@ -174,8 +174,54 @@ with sld_subtitle:
 
     sld_subtitle.add_col(subtitle_page.render(), "col-sm-12")
 ```
-### Altair and Plotly
-Altair and Plotly support will be added soon
+### Plotly and Altair
+Plotly or Altair graphs can be easily added with `add_plotly()` and `add_altair()`. Interactivity 
+is fully functional. 
+
+```python
+import plotly.express as px
+
+df = px.data.iris()
+fig = px.scatter(df, x="sepal_width", y="sepal_length",
+                 color="species", size="petal_length",
+                 hover_data=["petal_width"])
+
+fig.update_layout(autosize=False, width=900, height=500)
+
+sld_content_plotly = Container()
+
+with sld_content_plotly:
+    chart_p = Content()
+    j = fig.to_json()
+    chart_p.add_plotly(json=j)
+    sld_content_plotly.add_col(chart_p.render(), "col-sm-12")
+```
+
+```python
+import altair as alt
+
+source = px.data.iris()
+
+chart = (
+    alt.Chart(source)
+    .mark_circle(size=60)
+    .encode(
+        x="sepal_width", y="sepal_length", color="species",
+        tooltip=["species", "sepal_length", "sepal_width"],
+    )
+    .interactive()
+    .properties(width=900, height=500)
+)
+
+sld_content_altair = Container()
+with sld_content_altair:
+    chart_a = Content()
+    chart_a.add_heading(text="Altair example", tag="h2", )
+    j = chart.to_json()
+    chart_a.add_altair(json=j)
+    sld_content_altair.add_col(chart_a.render(), "col-sm-12")
+```
+**It is highly recommended to set chart's width and height manually**
 
 ### Presentation rendering
 Now, lets add all slides to a presentation using `Presentation` class
@@ -194,6 +240,8 @@ presentation.add_slide(sld_title)
 presentation.add_slide(sld_content_1col)
 presentation.add_slide(sld_content_2cols)
 presentation.add_slide(sld_content_images)
+presentation.add_slide(sld_content_plotly)
+presentation.add_slide(sld_content_altair)
 presentation.add_slide(sld_subtitle)
 
 # Render the presentation as an HTML file. You can pass the reveal.js theme
@@ -203,6 +251,7 @@ with open("presentation.html", "w") as f:
     f.write(html)
 ```
 And the output : [readme_example.html](https://raw.githack.com/fbxyz/respysive-slide/master/readme_example.html)
+(press F for full-screen)
 
 ### Presentation rendering with nbconvert
 Alternatively, nbconvert can be used to generate the slides using `from IPython.display import HTML` : 
