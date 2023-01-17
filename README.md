@@ -5,10 +5,12 @@ using Python, Bootstrap and Reveal.js.
 
 ___
 ## Installation
+You can clone this repo or : 
 ```
 pip install respysive_slide
 ```
 
+`#TODO : add conda package`
 ___
 ## Usage
 
@@ -208,7 +210,7 @@ HTML(bs_url)
 HTML(sld_title.render())
 ```
 
-`#todo : add an ipynb example`
+`#TODO : add an ipynb example`
 
 ## PDF export
 Like reveals.js, just add `?print-pdf` after your url (.i.e /presentation.html?print-pdf). 
