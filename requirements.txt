@@ -6,4 +6,5 @@
 #
 beautifulsoup4==4.11.1
     # via respysive-slide (pyproject.toml)
-
+soupsieve==2.3.2.post1
+    # via beautifulsoup4
