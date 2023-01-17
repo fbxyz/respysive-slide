@@ -1,7 +1,7 @@
 # respysive-slide
 ___
-A Python package that allows you to create interactive presentations 
-using Python, Bootstrap and Reveal.js.
+A Python package that allows you to create interactive presentations using Python, Bootstrap and Reveal.js. 
+Charts from Altair and Plotly can also be added.
 
 ___
 ## Installation
