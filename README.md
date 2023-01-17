@@ -55,6 +55,8 @@ with sld_title:
     # add the HTML render to a Bootstrap column of width 12
     sld_title.add_col(title_page.render(), "col-sm-12")
 ```
+![sld_title.png](assets%2Fimg%2Fsld_title.png)
+
 
 ### One column text slide
 Next, we create a new Container instance `sld_content_1col` : 
@@ -96,6 +98,8 @@ with sld_content_1col:
     # add the HTML render to a Bootstrap column of width 12
     sld_content_1col.add_col(txt.render(), "col-sm-12")
 ```
+![sld_content_1col.png](assets%2Fimg%2Fsld_content_1col.png)
+
 ### Two columns text slide
 Example with two text columns :
 ```python
@@ -121,6 +125,7 @@ with sld_content_2cols:
     sld_content_2cols.add_col(txt_left.render(), "col-sm-6")
     sld_content_2cols.add_col(txt_right.render(), "col-sm-6")
 ```
+![sld_content_2cols.png](assets%2Fimg%2Fsld_content_2cols.png)
 
 ### Two columns slide : image and list
 Example with one image and one ordered list :
@@ -156,24 +161,8 @@ with sld_content_images:
     lst.add_list(list_items, ordered=True)
     sld_content_images.add_col(lst.render(), "col-sm-7")
 ```
-###  Centered subtitle
-A simple slide with a unique centered subtitle :
-```python
-# Create a last slide with an unique subtitle
-sld_subtitle = Container()
+![sld_content_images.png](assets%2Fimg%2Fsld_content_images.png)
 
-with sld_subtitle:
-    subtitle_page = Content()
-    subtitle_page.add_subtitle(
-        text="A center subtitle",
-        icon="fa fa-check",
-        font_size="6rem",
-        color="#e63946",
-        text_align="center",
-    )
-
-    sld_subtitle.add_col(subtitle_page.render(), "col-sm-12")
-```
 ### Plotly and Altair
 Plotly or Altair graphs can be easily added with `add_plotly()` and `add_altair()`. Interactivity 
 is fully functional. 
@@ -222,6 +211,29 @@ with sld_content_altair:
     sld_content_altair.add_col(chart_a.render(), "col-sm-12")
 ```
 **It is highly recommended to set chart's width and height manually**
+![sld_content_plotly.png](assets%2Fimg%2Fsld_content_plotly.png)
+![sld_content_altair.png](assets%2Fimg%2Fsld_content_altair.png)
+
+###  Centered subtitle
+A simple slide with a unique centered subtitle :
+```python
+# Create a last slide with an unique subtitle
+sld_subtitle = Container()
+
+with sld_subtitle:
+    subtitle_page = Content()
+    subtitle_page.add_subtitle(
+        text="A center subtitle",
+        icon="fa fa-check",
+        font_size="6rem",
+        color="#e63946",
+        text_align="center",
+    )
+
+    sld_subtitle.add_col(subtitle_page.render(), "col-sm-12")
+```
+
+![sld_subtitle.png](assets%2Fimg%2Fsld_subtitle.png)
 
 ### Presentation rendering
 Now, lets add all slides to a presentation using `Presentation` class
