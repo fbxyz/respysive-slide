@@ -36,8 +36,7 @@ class Presentation:
             """<script src="https://cdn.plot.ly/plotly-2.17.1.min.js"></script>""", "html.parser"
         )
 
-        altair_js = BeautifulSoup(
-            """<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+        altair_js = BeautifulSoup("""<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
             <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
             <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>""",
             "html.parser")
@@ -47,20 +46,24 @@ class Presentation:
             "html.parser")
 
         bootstrap_correction = BeautifulSoup(
-            '<style type="text/css">[hidden] {display: inherit !important;}</style>', "html.parser")
+            """
+            <!--Correction to allow transition between slides-->
+            <style type="text/css">[hidden] {display: inherit !important;}</style>""", "html.parser")
 
         fontawesome_css = BeautifulSoup(
             "<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css'>",
             "html.parser")
 
+        svg_width = BeautifulSoup("<style type='text/css'>svg{max-width: 100%;}</style>", "html.parser")
+
         reveal_init = BeautifulSoup(
-            """<script>Reveal.initialize({center: false});</script>""", "html.parser")
-        custom_css = BeautifulSoup(
-            """<style>
-                .present {
-                    height: 100% !important;
-                }
-            </style>""", "html.parser")
+            """<script>Reveal.initialize(
+            {center: false,
+             pdfMaxPagesPerSlide: 1,
+             pdfSeparateFragments: false,
+             disableLayout: false     
+            });</script>""", "html.parser")
+
 
         soup = BeautifulSoup(self.presentation_html, "html.parser")
         head = soup.head
@@ -68,6 +71,7 @@ class Presentation:
         head.append(revealtheme_css)
         head.append(bootstrap_css)
         head.append(fontawesome_css)
+        head.append(svg_width)
         head.append(altair_js)
         head.append(plotly_js)
 
@@ -75,5 +79,4 @@ class Presentation:
         body.append(bootstrap_correction)
         body.append(reveal_js)
         body.append(reveal_init)
-        body.append(custom_css)
         return soup.prettify(formatter="html5")
