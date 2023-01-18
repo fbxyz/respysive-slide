@@ -9,8 +9,9 @@ class Presentation:
         self.theme = theme
         self.custom_theme_url = custom_theme_url
 
-    def add_slide(self, container):
-        self.presentation_html += container.render()
+    def add_slide(self, container: list):
+        for i in container:
+            self.presentation_html += i.render()
 
     def render_presentation(self, theme: str = "white", custom_theme_url=None):
         self.presentation_html += "</div></div></body></html>"
@@ -39,7 +40,7 @@ class Presentation:
         altair_js = BeautifulSoup("""<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
             <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
             <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>""",
-            "html.parser")
+                                  "html.parser")
 
         bootstrap_css = BeautifulSoup(
             "<link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css'>",
@@ -63,7 +64,6 @@ class Presentation:
              pdfSeparateFragments: false,
              disableLayout: false     
             });</script>""", "html.parser")
-
 
         soup = BeautifulSoup(self.presentation_html, "html.parser")
         head = soup.head

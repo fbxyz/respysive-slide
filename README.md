@@ -259,14 +259,9 @@ be passed : `theme='custom, custom_theme_url='the_css_url'`
 # Create a new presentation
 presentation = Presentation()
 
-# Add the title slide = to the presentation
-presentation.add_slide(sld_0)
-presentation.add_slide(sld_1)
-presentation.add_slide(sld_2)
-presentation.add_slide(sld_3)
-presentation.add_slide(sld_4)
-presentation.add_slide(sld_5)
-presentation.add_slide(sld_6)
+# Add the title slide to the presentation
+slides = [sld_0, sld_1, sld_2, sld_3, sld_4, sld_5, sld_6]
+presentation.add_slide(slides)
 
 # Render the presentation as an HTML file. You can pass the reveal.js theme
 html = presentation.render_presentation(theme='moon')
