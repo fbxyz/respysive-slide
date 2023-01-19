@@ -62,7 +62,8 @@ class Presentation:
             {center: false,
              pdfMaxPagesPerSlide: 1,
              pdfSeparateFragments: false,
-             disableLayout: false     
+             disableLayout: false,
+             slideNumber: true,  
             });</script>""", "html.parser")
 
         soup = BeautifulSoup(self.presentation_html, "html.parser")
