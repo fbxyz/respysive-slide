@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import uuid
+from respysive.utils import _parse_style_class
 
 
 class Content:
@@ -7,12 +8,6 @@ class Content:
         self.content = ""
         self.scripts = {}
         self.grid_cols = 0
-
-    @staticmethod
-    def _parse_style(style: str):
-        if style:
-            return f"style='{style}'"
-        return ""
 
     def add_script(self, name: str, script: str):
         """
@@ -22,137 +17,171 @@ class Content:
         """
         self.scripts[name] = script
 
-
-    def add_heading(self, text: str, tag: str = "h1", margin_bottom: str = "30px", icon: str = None,
-                    divclass: list = None, **kwargs):
+    def add_heading(self, text: str, tag: str = "h1", icon: str = None, **kwargs):
         """
         Add a heading element to the HTML document.
         :param text: The text of the heading.
         :param tag: The HTML tag to use for the heading. Default is 'h1'.
-        :param margin_bottom: The margin-bottom property of the heading. Default is '30px'.
         :param icon: The icon of the heading (optional).
-        :param divclass: the html class to pass. example: ['fragment', 'r-fit-text'] (optional).
-        :param kwargs: Additional CSS styles to apply to the image. (optional)
+        :param kwargs: Additional CSS styles and html class to apply to the image. (optional)
                 The keys should be in the format of CSS property names with '_' instead of '-', example: font_size
+                you can also pass the class key with a string or a list of strings
+                example : {'font_size': '20px', 'color': 'blue', 'class':'my-class'} or  {'font_size': '20px',
+                 'color': 'blue', 'class':['my-class','my-second-class']}
         """
         if tag not in ["h1", "h2", "h3", "h4", "h5"]:
             raise ValueError("Invalid tag, the tag must be one of h1, h2, h3, h4 or h5")
-        style_str = ""
-        for key, value in kwargs.items():
-            css_key = key.replace("_", "-")
-            style_str += f"{css_key}: {value};"
 
-        c = f"class='{' '.join(divclass)}'" if divclass else ""
+        s = _parse_style_class(kwargs)
 
         self.content += (
-            f"<{tag} {c} style='margin-top-bottom: {margin_bottom}; {style_str}'><i class='{icon}'></i> {text}</{tag}>"
+            f"<{tag} {s}><i class='{icon}'></i> {text}</{tag}>"
             if icon
-            else f"<{tag} {c} style='margin-top-bottom: {margin_bottom}; {style_str}'>{text}</{tag}>"
+            else f"<{tag} {s}>{text}</{tag}>"
         )
 
-    def add_text(self, text: str, tag: str = "p", divclass: list = None, **kwargs):
+    def add_text(self, text: str, tag: str = "p", **kwargs):
         """
         Add a text element to the HTML document.
         :param text: The text to be added.
         :param tag: The HTML tag to use for the text. Default is 'p'.
-        :param divclass: the html class to pass. example: ['fragment', 'r-fit-text'] (optional)
-        :param kwargs: Additional CSS styles to apply to the image. (optional)
+        :param kwargs: Additional CSS styles and html class to apply to the image. (optional)
                 The keys should be in the format of CSS property names with '_' instead of '-', example: font_size
+                you can also pass the class key with a string or a list of strings
+                example : {'font_size': '20px', 'color': 'blue', 'class':'my-class'} or  {'font_size': '20px',
+                 'color': 'blue', 'class':['my-class','my-second-class']}
         """
         if tag not in ["p", "span"]:
             raise ValueError("Invalid tag, the tag must be one of p or span")
 
-        style_str = ""
-        for key, value in kwargs.items():
-            css_key = key.replace("_", "-")
-            style_str += f"{css_key}: {value};"
-        # TODO: parse style
+        s = _parse_style_class(kwargs)
 
-        c = f"class='{' '.join(divclass)}'" if divclass else ""
-
-        self.content += f"""<{tag} {c} style='{style_str}'>{text}</{tag}>"""
+        self.content += f"""<{tag} {s}>{text}</{tag}>"""
 
     def add_list(
-            self, items: list, ordered=False, font_size="1rem", **kwargs
-    ):
+            self, items: list, ordered=False, **kwargs):
         """
         Add a list element to the HTML document.
         :param items: The items of the list.
         :param ordered: Whether the list should be ordered or not.
-        :param font_size: the font-size to fit in boostrap container.
-        :param kwargs: Additional CSS styles to apply to the image. (optional)
+        :param kwargs: Additional CSS styles and html class to apply to the image. (optional)
                 The keys should be in the format of CSS property names with '_' instead of '-', example: font_size
+                you can also pass the class key with a string or a list of strings
+                example : {'font_size': '20px', 'color': 'blue', 'class':'my-class'} or  {'font_size': '20px',
+                 'color': 'blue', 'class':['my-class','my-second-class']}
         """
         list_tag = "ol" if ordered else "ul"
-        style_str = ""
-        for key, value in kwargs.items():
-            css_key = key.replace("_", "-")
-            style_str += f"{css_key}: {value};"
-        list_items = "\n".join([f"<li>{item}</li>" for item in items])
-        self.content += f"<{list_tag} style='font-size:{font_size}; {style_str}'>\n{list_items}\n</{list_tag}>"
 
-    def add_image(self, src: str, alt: str = "alt text", divclass: list = None, **kwargs):
+        s = _parse_style_class(kwargs)
+
+        list_items = "\n".join([f"<li>{item}</li>" for item in items])
+        self.content += f"<{list_tag} {s}>\n{list_items}\n</{list_tag}>"
+
+    def add_image(self, src: str, alt: str = "image can't be shown", **kwargs):
         """
         Add an image element to the HTML document.
         :param src: The source of the image.
         :param alt: The alternative text for the image.
-        :param divclass: the html class to pass. example: ['fragment', 'r-fit-text'] (optional).
-        :param kwargs: Additional CSS styles to apply to the image. (optional)
+        :param kwargs: Additional CSS styles and html class to apply to the image. (optional)
                 The keys should be in the format of CSS property names with '_' instead of '-', example: font_size
+                you can also pass the class key with a string or a list of strings
+                example : {'font_size': '20px', 'color': 'blue', 'class':'my-class'} or  {'font_size': '20px',
+                 'color': 'blue', 'class':['my-class','my-second-class']}
         """
 
-        c = f"{' '.join(divclass)}" if divclass else ""
+        if 'class' not in kwargs:
+            kwargs['class'] = []
+        elif isinstance(kwargs['class'], str):
+            kwargs['class'] = [kwargs['class']]
+        kwargs['class'].append('img-fluid')
 
-        style_str = ""
-        for key, value in kwargs.items():
-            css_key = key.replace("_", "-")
-            style_str += f"{css_key}: {value};"
-        self.content += (
-            f"<img src='{src}' alt='{alt}' class= 'img-fluid {c}' style='{style_str}'>"
-        )
+        s = _parse_style_class(kwargs)
 
-    def add_svg(self, svg: str, width: str = None, height: str = None, **kwargs):
+        self.content += f"<img src='{src}' alt='{alt}' {s}>"
+
+    def add_svg(self, svg: str,  **kwargs):
         """
         Add a svg to the document.
-
-        :param svg_code : The code of the svg.
-        :param width : The width of the svg.
-        :param height : The height of the svg.
-        :param kwargs: Additional CSS styles to apply to the svg. (optional)
+        :param svg : The code of the svg.
+        :param kwargs: Additional CSS styles and html class to apply to the image. (optional)
                 The keys should be in the format of CSS property names with '_' instead of '-', example: font_size
+                you can also pass the class key with a string or a list of strings
+                example : {'font_size': '20px', 'color': 'blue', 'class':'my-class'} or  {'font_size': '20px',
+                 'color': 'blue', 'class':['my-class','my-second-class']}
         """
-        width_str = f'width="{width}"' if width else ""
-        height_str = f'height="{height}"' if height else ""
-        style_str = ""
-        for key, value in kwargs.items():
-            css_key = key.replace("_", "-")
-            style_str += f"{css_key}: {value};"
-        self.content += f"""<div>{svg}</div>"""
 
-    def add_plotly(self, json: str):
+        if 'class' not in kwargs:
+            kwargs['class'] = []
+        elif isinstance(kwargs['class'], str):
+            kwargs['class'] = [kwargs['class']]
+        kwargs['class'].append('img-fluid')
+
+        s = _parse_style_class(kwargs)
+
+        self.content += f"""<div {s}>{svg}</div>"""
+
+    def add_plotly(self, json: str, **kwargs):
         """
         Add a plotly json to the document.
-
         :param json : a plotly json (fig.to_json()).
+        :param kwargs: Additional CSS styles and html class to apply to the image. (optional)
+        The keys should be in the format of CSS property names with '_' instead of '-', example: font_size
+        you can also pass the class key with a string or a list of strings
+        example : {'font_size': '20px', 'color': 'blue', 'class':'my-class'} or  {'font_size': '20px',
+         'color': 'blue', 'class':['my-class','my-second-class']}
 
         """
+        if 'class' not in kwargs:
+            kwargs['class'] = []
+        elif isinstance(kwargs['class'], str):
+            kwargs['class'] = [kwargs['class']]
+        kwargs['class'].append('img-fluid')
+
+        s = _parse_style_class(kwargs)
+
         chart_id = "chart-" + str(uuid.uuid4())
-        self.content += f"""<div id='{chart_id}'></div>
+        self.content += f"""<div {s} id='{chart_id}'></div>
             <script>var Plotjson = '{json}';
             var figure = JSON.parse(Plotjson);
             Plotly.newPlot('{chart_id}', figure.data, figure.layout);</script>"""
 
-    def add_altair(self, json: str):
+    def add_altair(self, json: str, **kwargs):
         """
         Add an Altair json to the document.
-
         :param json : an Altair json (chart.to_json()).
+        :param kwargs: Additional CSS styles and html class to apply to the image. (optional)
+        The keys should be in the format of CSS property names with '_' instead of '-', example: font_size
+        you can also pass the class key with a string or a list of strings
+        example : {'font_size': '20px', 'color': 'blue', 'class':'my-class'} or  {'font_size': '20px',
+        'color': 'blue', 'class':['my-class','my-second-class']}
 
         """
+        if 'class' not in kwargs:
+            kwargs['class'] = []
+        elif isinstance(kwargs['class'], str):
+            kwargs['class'] = [kwargs['class']]
+        kwargs['class'].append('img-fluid')
+
+        s = _parse_style_class(kwargs)
+
         chart_id = "chart-" + str(uuid.uuid4())
-        self.content += f"""<div id='{chart_id}'></div>
+        self.content += f"""<div {s} id='{chart_id}'></div>
         <script>var opt = {{renderer: "svg"}};
         vegaEmbed("#{chart_id}", {json} , opt);</script>"""
+
+    def add_div(self, div: str, **kwargs):
+        """
+        Add a simple div.
+        :param div : whatever you want that can fit in a div .
+        :param kwargs: Additional CSS styles and html class to apply to the image. (optional)
+        The keys should be in the format of CSS property names with '_' instead of '-', example: font_size
+        you can also pass the class key with a string or a list of strings
+        example : {'font_size': '20px', 'color': 'blue', 'class':'my-class'} or  {'font_size': '20px',
+        'color': 'blue', 'class':['my-class','my-second-class']}
+        """
+
+        s = _parse_style_class(kwargs)
+        self.content += f"""<div {s}>{div}</div>"""
 
     def render(self):
         """

@@ -1,46 +1,56 @@
 from bs4 import BeautifulSoup
+from respysive.utils import _parse_style_class
 
 
 class Container:
-    def __init__(self, center=False):
+    def __init__(self, center=False, text_align='left'):
 
-        div = """<section class="center"><div class="container">""" if center else """<section><div class="container">"""
+        div = f"""<section class="center"><div class="container" style="text-align: {text_align};" >""" \
+            if center else f"""<section><div class="container" style="text-align: {text_align};" >"""
         self.container_html = div
         self.open_row = False
         self.col_count = 0
 
     def __enter__(self):
-        self.add_row()
+        self._add_row()
         return self
 
     def __exit__(self, *args):
-        self.close_row()
+        self._close_row()
 
-    def add_row(self):
-        self.container_html += """\n<!-- New Row -->\n<div class="row">"""
+    def _add_row(self, **kwargs):
+        dic = kwargs
+
+        for key, value in dic.items():
+            if key == 'class':
+                if isinstance(value, str):
+                    dic[key] = [value]
+                    dic[key].append("row")
+        if 'class' not in dic:
+            dic['class'] = ['row']
+
+        s = _parse_style_class(dic)
+
+        self.container_html += f"<div {s}>"
         self.open_row = True
         self.col_count = 0
 
-    def add_col(
-            self,
-            content: str,
-            col_class: str,
-            **kwargs
-    ):
+    def add_col(self, content: str, col_class: str = "col-12", **kwargs):
         if not self.open_row:
             raise ValueError("You must open a row before adding a column")
         col_size = int(col_class.split("-")[-1])
         if self.col_count + col_size > 12:
             raise ValueError("Total number of columns in a row must not exceed 12")
-        style_str = ""
-        for key, value in kwargs.items():
-            css_key = key.replace("_", "-")
-            style_str += f"{css_key}: {value};"
-
-        self.container_html += f'<div class="col {col_class}" style="{style_str}">{content}</div> '
+        if 'class' not in kwargs:
+            kwargs['class'] = []
+        elif isinstance(kwargs['class'], str):
+            kwargs['class'] = [kwargs['class']]
+        kwargs['class'].append(col_class)
+        s = _parse_style_class(kwargs)
+        self.container_html += f'<div {s}>{content}</div> '
         self.col_count += col_size
 
-    def close_row(self):
+    def _close_row(self):
         if self.open_row:
             self.container_html += "</div>"
             self.open_row = False
