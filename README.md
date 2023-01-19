@@ -45,8 +45,7 @@ with sld_0:
     col1.add_heading(text="The main Title", tag="h1", **css_class)
 
     # col1 is added in a 12 width Bootstrap columns (default value)
-    css_style_left = {'text-align': 'left'}
-    sld_0.add_col(col1.render(), "col-12")
+    sld_0.add_col(col1.render(), col_class="col-12")
 ```
 
 A second row for the subtitle is created inside the sld_0 container
@@ -264,6 +263,49 @@ with sld_6:
 ```
 
 ![sld_subtitle.png](assets%2Fimg%2Fsld_subtitle.png)
+
+###  Customize content
+This example show how to add cusomized content like Bootstrap cards
+
+```python
+# Using add_div to add bootstrap card
+sld_7 = Container()
+
+with sld_7:
+    col1 = Content()
+    col1.add_heading(text="custom div example", tag="h2")
+    sld_7.add_col(col1.render(), "col-sm-12")
+
+def bs_card(title, content, bg="secondary"):
+    return f"""
+  <div class="card text-white bg-{bg} mb-3 h-100" style="max-width: 18rem;">
+      <h4 class="card-header">{title}</h4>
+      <div class="card-body">
+        <small class="card-text">{content}</small>
+      </div>
+  </div>
+    """
+
+with sld_7:
+    card1 = Content()
+    card1_div = bs_card("The first card", "And its content")
+    card1.add_div(div=card1_div)
+
+    card2 = Content()
+    card2_div = bs_card("The second card", "And its content", "info")
+    card2.add_div(div=card2_div)
+
+    card3 = Content()
+    card_img = f"<img src='{logo_url}' class= 'mx-auto my-auto d-block'>"
+    card3_div = bs_card("images work too", card_img, "warning")
+    card3.add_div(div=card3_div)
+
+    sld_7.add_col(card1.render(), "col-sm-4")
+    sld_7.add_col(card2.render(), "col-sm-4")
+    sld_7.add_col(card3.render(), "col-sm-4")
+```
+
+![sld_custom.png](assets%2Fimg%2Fsld_custom.png)
 
 ### Presentation rendering
 Now, lets add all slides to a presentation using `Presentation` class
