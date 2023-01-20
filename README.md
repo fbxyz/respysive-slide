@@ -76,7 +76,6 @@ with sld_0:
     col3b.add_image(logo_url, **css_img)
     sld_0.add_col(col3b.render(), "col-4")
 ```
-
 ![sld_title.png](assets%2Fimg%2Fsld_title.png)
 
 ### One column text slide
@@ -351,4 +350,4 @@ Like reveals.js, just add `?print-pdf` after your url (.i.e /presentation.html?p
 Then print the results with your browser : 
 [readme_example.html?print-pdf ](https://raw.githack.com/fbxyz/respysive-slide/master/readme_example.html?print-pdf)
 
-The best results with reveal.js are obtained with chrome and chromium
+Best results are obtained with Chrome and Chromium
