@@ -5,8 +5,7 @@ Charts from Altair and Plotly can also be added.
 
 You will find an [example here](https://raw.githack.com/fbxyz/respysive-slide/master/readme_example.html)
 
-![respysiv.gif](assets%2Fimg%2Frespysiv.gif)
-
+![respysiv.png](assets%2Fimg%2Frespysiv.png)
 ___
 ## Installation
 With PyPI 
