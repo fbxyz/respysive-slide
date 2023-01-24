@@ -64,3 +64,26 @@ class Container:
         html = f"""{self.container_html}"""
         soup = BeautifulSoup(html, "html.parser")
         return soup.prettify()
+
+
+class SubSlides:
+    def __init__(self):
+        self.sub_slides = []
+
+    def add_sub_slide(self):
+        sub_slide = Container()
+        self.sub_slides.append(sub_slide)
+        return sub_slide
+
+    def _add_section(self):
+        self.html = "<section>"
+
+    def _close_section(self):
+        self.html += "</section>"
+
+    def render(self):
+        self._add_section()
+        for sub_slide in self.sub_slides:
+            self.html += sub_slide.render()
+        self._close_section()
+        return self.html

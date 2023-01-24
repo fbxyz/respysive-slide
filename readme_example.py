@@ -1,7 +1,7 @@
 from respysive import Content, Presentation, Container
 from markdown import markdown
 
-from respysive import Content, Presentation, Container
+from respysive import Content, Presentation, Container, SubSlides
 
 # A new Container instance is created. The slide will be centered
 sld_0 = Container(center=True)
@@ -188,7 +188,6 @@ with sld_7:
     col1.add_heading(text="custom div example", tag="h2")
     sld_7.add_col(col1.render(), "col-sm-12")
 
-
 def bs_card(title, content, bg="secondary"):
     return f"""
   <div class="card text-white bg-{bg} mb-3 h-100" style="max-width: 18rem;">
@@ -218,11 +217,26 @@ with sld_7:
     sld_7.add_col(card2.render(), "col-sm-4")
     sld_7.add_col(card3.render(), "col-sm-4")
 
+
+sub_slides = SubSlides()
+with sub_slides.add_sub_slide() as slide:
+    col1 = Content()
+    col1.add_heading(text="I'm an Horizontal Slide, press Down", tag="h3", **{'class': ['r-fit-text']})
+    slide.add_col(col1.render())
+with sub_slides.add_sub_slide() as slide2:
+    col1 = Content()
+    col1.add_heading(text="I'm a Vertical Slide", tag="h3", **{'class': ['r-fit-text']})
+    slide2.add_col(col1.render())
+with sub_slides.add_sub_slide() as slide3:
+    col1 = Content()
+    col1.add_heading(text="And another one", tag="h3", **{'class': ['r-fit-text']})
+    slide3.add_col(col1.render())
+
 # Create a new presentation
 presentation = Presentation()
 
 # Add the title slide to the presentation
-slides = [sld_0, sld_1, sld_2, sld_3, sld_4, sld_5, sld_6, sld_7]
+slides = [sld_0, sld_1, sld_2, sld_3, sld_4, sld_5, sld_6, sub_slides, sld_7]
 presentation.add_slide(slides)
 
 # Render the presentation as an HTML file. You can pass the reveal.js theme

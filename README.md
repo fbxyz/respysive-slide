@@ -263,8 +263,31 @@ with sld_6:
 
 ![sld_subtitle.png](assets%2Fimg%2Fsld_subtitle.png)
 
+###  Vertical Slide
+You can add vertical slides using the `SubSlides()` method instead of `Container()`.
+
+Note that the first container will be horizontal, others vertical.
+
+```python
+from respysive import SubSlides
+sub_slides = SubSlides()
+with sub_slides.add_sub_slide() as slide:
+    col1 = Content()
+    col1.add_heading(text="I'm an Horizontal Slide, press Down", tag="h3", **{'class': ['r-fit-text']})
+    slide.add_col(col1.render())
+with sub_slides.add_sub_slide() as slide2:
+    col1 = Content()
+    col1.add_heading(text="I'm a Vertical Slide", tag="h3", **{'class': ['r-fit-text']})
+    slide2.add_col(col1.render())
+with sub_slides.add_sub_slide() as slide3:
+    col1 = Content()
+    col1.add_heading(text="And another one", tag="h3", **{'class': ['r-fit-text']})
+    slide3.add_col(col1.render())
+```
+![sld_vertical.png](assets%2Fimg%2Fsld_vertical.png)
+
 ###  Customize content
-This example show how to add cusomized content like Bootstrap cards
+This example show how to add customized content like Bootstrap cards
 
 ```python
 # Using add_div to add bootstrap card
@@ -319,7 +342,7 @@ be passed : `theme='custom, custom_theme_url='the_css_url'`
 presentation = Presentation()
 
 # Add the title slide to the presentation
-slides = [sld_0, sld_1, sld_2, sld_3, sld_4, sld_5, sld_6]
+slides = [sld_0, sld_1, sld_2, sld_3, sld_4, sld_5, sld_6,sub_slides,sld_7]
 presentation.add_slide(slides)
 
 # Render the presentation as an HTML file. You can pass the reveal.js theme
