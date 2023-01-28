@@ -320,6 +320,15 @@ Presentation.add_slide(file_name,
 
 Note that you need an internet connection to present your Slides !
 
+### PDF Export
+
+The slide can be exported with the classic  <a href="https://revealjs.com/pdf-export/" target="_blank">Reveal.js method</a>.
+
+Just add ?print-pdf at the end of the url and open the in-browser print dialog : 
+<a href="https://raw.githack.com/fbxyz/respysive-slide/master/readme_example.html?print-pdf" target="_blank"> https://raw.githack.com/fbxyz/respysive-slide/master/readme_example.html?print-pdf </a>.
+
+Best results are obtained with Chrome or Chromium
+
 ## Future features
 - add custom CSS
 - add speaker view
