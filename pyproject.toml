@@ -8,7 +8,7 @@ authors = [{name = "fbxyz"}]
 description = "A Python package that allows you to create interactive presentations using Python, Bootstrap and Reveal.js. Charts from Altair and Plotly can also be added"
 
 readme = "README.md"
-version = "1.1.1"
+version = "1.1.2"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 keywords = ["slide", "presentation", "reveal.js", "Bootstrap"]
