@@ -4,10 +4,17 @@ from respysive.utils import _parse_style_class
 
 
 class Content:
+    """
+    A class representing a slide content.
+    """
     def __init__(self):
+
         self.content = ""
         self.scripts = {}
         self.grid_cols = 0
+
+    def clear(self):
+        self.content = ""
 
     def add_script(self, name: str, script: str):
         """
@@ -17,7 +24,7 @@ class Content:
         """
         self.scripts[name] = script
 
-    def add_heading(self, text: str, tag: str = "h1", icon: str = None, **kwargs):
+    def add_heading(self, text: str, tag: str = "h3", icon: str = None, **kwargs):
         """
         Add a heading element to the HTML document.
         :param text: The text of the heading.
@@ -35,6 +42,7 @@ class Content:
         s = _parse_style_class(kwargs)
 
         self.content += (
+
             f"<{tag} {s}><i class='{icon}'></i> {text}</{tag}>"
             if icon
             else f"<{tag} {s}>{text}</{tag}>"
@@ -77,7 +85,7 @@ class Content:
         list_items = "\n".join([f"<li>{item}</li>" for item in items])
         self.content += f"<{list_tag} {s}>\n{list_items}\n</{list_tag}>"
 
-    def add_image(self, src: str, alt: str = "image can't be shown", **kwargs):
+    def add_image(self, src: str, alt: str = "", **kwargs):
         """
         Add an image element to the HTML document.
         :param src: The source of the image.
@@ -97,7 +105,7 @@ class Content:
 
         s = _parse_style_class(kwargs)
 
-        self.content += f"<img src='{src}' alt='{alt}' {s}>"
+        self.content += f"<img data-src='{src}' alt='{alt}' {s}>"
 
     def add_svg(self, svg: str,  **kwargs):
         """
