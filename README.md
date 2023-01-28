@@ -4,7 +4,7 @@ A Python package that allows you to create interactive presentations using Pytho
 Bootstrap and Reveal.js. 
 Charts from Altair and Plotly can also be added.
 
-![respysiv.png](assets%2Fimg%2Frespysiv.png)
+![respysiv.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/respysiv.png)
 
 You will find a <a href="https://raw.githack.com/fbxyz/respysive-slide/master/readme_example.html" target="_blank">live example here</a>
 
@@ -67,7 +67,7 @@ the add_title method takes a dictionary kwarg `styles` containing :
  - one or several CSS styles as key : values
  - and class as a unique key:
 
-![slide1.png](assets%2Fimg%2Fslide1.png)
+![slide1.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide1.png)
 
 ### A simple text slide
 
@@ -95,7 +95,7 @@ slide2.add_content([txt], columns=[12])
  ```
 Note that for the add_title() method, <a href="https://fontawesome.com/icons" target="_blank">Fontawesome icons</a> can be added.
 
-![slide2.png](assets%2Fimg%2Fslide2.png)
+![slide2.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide2.png)
 
 ### A two columns slide with text and image
 
@@ -141,7 +141,7 @@ slide3.add_content([text, url], columns=[7, 5], styles=css_txt)
 
 `class : 'fragment'` is used to pass <a href="https://revealjs.com/fragments/" target="_blank">Reveal.js fragments</a>
 
-![slide3.png](assets%2Fimg%2Fslide3.png)
+![slide3.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide3.png)
 
 ### Plotly and Altair
 Plotly or Altair graphs can be easily added with `add_content()`. Interactivity 
@@ -175,7 +175,7 @@ css_txt = [{'class': 'stretch'}]
 slide4.add_content([j], columns=[12], styles=css_txt)
 
 ```
-![slide4.png](assets%2Fimg%2Fslide4.png)
+![slide4.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide4.png)
 
 ```python
 ## Slide 5 : Altair plot##
@@ -205,7 +205,7 @@ j = chart.to_json()
 # add the scatter plot to the slide
 slide5.add_content([j], columns=[12])
 ```
-![slide5.png](assets%2Fimg%2Fslide5.png)
+![slide5.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide5.png)
 
 It is **highly recommended** to set chart's width and height manually
 
@@ -241,7 +241,7 @@ slide6.add_title("Bootstrap cards can be added")
 slide6.add_card(cards, styles_list)
 ```
 
-![slide6.png](assets%2Fimg%2Fslide6.png)
+![slide6.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide6.png)
 
 ### Background image
 
@@ -266,7 +266,7 @@ css_background = {"class": "text-center", "color": "#e63946", "background-color"
 slide7.add_title("Image  background", **css_background)
 ```
 
-![slide7.png](assets%2Fimg%2Fslide7.png)
+![slide7.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide7.png)
 
 ### Vertical slides
 
@@ -288,7 +288,7 @@ slide9.add_content([text])
 
 They will be added as list in the next method to export your presentation
 
-![slide8_9.png](assets%2Fimg%2Fslide8_9.png)
+![slide8_9.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide8_9.png)
 
 ### Presentation rendering
 Last step in rendering your Reveal.js presentation with `respysive-slide` as  HTML
