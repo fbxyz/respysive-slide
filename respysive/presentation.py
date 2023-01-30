@@ -32,22 +32,33 @@ class Presentation:
         else:
             self.slides.append(slide)
 
-    def to_html(self, theme="moon", width=960, height=600, minscale=0.2, maxscale=1.5, margin=0.1):
+    def to_html(self, theme="moon", width=960, height=600, minscale=0.2, maxscale=1.5, margin=0.1, custom_theme=None):
         """
-        Generate the HTML code for the presentation.
+        Return the presentation as an HTML string.
 
-        :param theme: The name of the theme to use for the presentation. Default is "moon".
-        :param width: The width of the presentation in pixels. Default is 960.
-        :param height: The height of the presentation in pixels. Default is 600.
-        :param minscale: The minimum scale at which the presentation can be viewed. Default is 0.2.
-        :param maxscale: The maximum scale at which the presentation can be viewed. Default is 1.5.
-        :param margin: The margin around the presentation in percentage. Default is 0.1.
-        :return: A string containing the HTML code for the presentation.
+        :param theme: str, the name of the reveal.js theme to use, either one of the pre-built themes (default: 'moon') or 'custom'
+        :param width: int, the width of the presentation (default: 960)
+        :param height: int, the height of the presentation (default: 600)
+        :param minscale: float, the minimum scale of the presentation (default: 0.2)
+        :param maxscale: float, the maximum scale of the presentation (default: 1.5)
+        :param margin: float, the margin of the presentation (default: 0.1)
+        :param custom_theme: str, a link to a custom theme CSS file, required if theme is set to 'custom'
+        :return: str, the presentation in HTML format
+        :raises ValueError: if the theme is set to 'custom' but no custom_theme link is provided
         """
+
+        if theme == "custom" and custom_theme is None:
+            raise ValueError("If the theme is set to 'custom', a URL for the custom theme must be provided.")
+
+        if custom_theme:
+            theme_link = f"<link rel='stylesheet' href='{custom_theme}' />"
+        else:
+            theme_link = f"https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/theme/{theme}.min.css"
+            print(theme_link)
 
         css_links = [
             "https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.min.css",
-            f"https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/theme/{theme}.min.css",
+            theme_link,
             "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css",
             "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
         ]
@@ -109,20 +120,31 @@ class Presentation:
 
         return presentation_html
 
-    def save_html(self, file_name, theme="moon", width=960, height=600, minscale=0.2, maxscale=1.5, margin=0.1):
+    def save_html(self, file_name, theme="moon", width=960, height=600, minscale=0.2, maxscale=1.5, margin=0.1,
+                  custom_theme=None):
         """
-        Save the presentation in HTML format.
+        Saves the presentation as an HTML file.
 
-        :param file_name: The name of the file to save the HTML content to.
-        :param theme: The name of the theme to use for the presentation. Default is "moon".
+        :param file_name: The name of the file to save the presentation to.
+        :param theme: The theme to use for the presentation. Default is "moon".
         :param width: The width of the presentation in pixels. Default is 960.
         :param height: The height of the presentation in pixels. Default is 600.
-        :param minscale: The minimum scale at which the presentation can be viewed. Default is 0.2.
-        :param maxscale: The maximum scale at which the presentation can be viewed. Default is 1.5.
-        :param margin: The margin around the presentation in percentage. Default is 0.1.
+        :param minscale: The minimum scale of the presentation. Default is 0.2.
+        :param maxscale: The maximum scale of the presentation. Default is 1.5.
+        :param margin: The margin around the presentation. Default is 0.1.
+        :param custom_theme: The URL of a custom theme CSS file.
+        :raises ValueError: If the theme is set to "custom" and no URL is provided for the custom theme.
         """
-        presentation_html = self.to_html(theme=theme, width=width, height=height, minscale=minscale, maxscale=maxscale,
-                                         margin=margin)
+        if theme == "custom" and custom_theme is None:
+            raise ValueError("If the theme is set to 'custom', a URL for the custom theme must be provided.")
+
+        if custom_theme:
+            theme_link = f"<link rel='stylesheet' href='{custom_theme}' />"
+        else:
+            theme_link = theme
+
+        presentation_html = self.to_html(theme=theme_link, width=width, height=height, minscale=minscale, maxscale=maxscale,
+                                         margin=margin, custom_theme=custom_theme)
 
         with open(file_name, "w") as f:
             f.write(presentation_html)

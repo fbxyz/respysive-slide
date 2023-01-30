@@ -315,10 +315,11 @@ Presentation.add_slide(file_name,
                        height=600,
                        minscale=0.2,
                        maxscale=1.5,
-                       margin=0.1)
+                       margin=0.1,
+                       custom_theme=None)  # If theme="custom", pass here the custom css url 
 ```
 
-Note that you need an internet connection to present your Slides !
+Note that you need an internet connection to show your Slides !
 
 ### PDF Export
 
@@ -330,7 +331,6 @@ Just add ?print-pdf at the end of the url and open the in-browser print dialog :
 Best results are obtained with Chrome or Chromium
 
 ## Future features
-- add custom CSS
 - add speaker view
 - offline presentation
 - better recognition of json plotly
