@@ -195,7 +195,7 @@ p.add_slide([slide1, slide2, slide3, slide4, slide5, slide6, slide7, [slide8, sl
 
 # Saving the presentation in HTML format
 
-p.save_html("readme_example.html", theme="custom")
+p.save_html("readme_example.html")
 
 
 #  custom_theme = "https://raw.githack.com/fbxyz/respysive-slide/master/assets/css/sorbone.css"
