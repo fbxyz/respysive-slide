@@ -173,7 +173,7 @@ slide_kwargs = {
 # Create a slide object with slide kwargs
 slide7 = Slide(center=True, **slide_kwargs)
 
-css_background = {"class": "text-center", "color": "#e63946", "background-color":"#f1faee"}
+css_background = {"class": "text-center", "color": "#e63946", "background-color": "#f1faee"}
 slide7.add_title("Image  background", **css_background)
 
 ## Slide 8 and 9 : Vertical slide ##
@@ -194,4 +194,9 @@ slide9.add_content([text])
 p.add_slide([slide1, slide2, slide3, slide4, slide5, slide6, slide7, [slide8, slide9]])
 
 # Saving the presentation in HTML format
-p.save_html("readme_example.html")
+
+p.save_html("readme_example.html", theme="custom")
+
+
+#  custom_theme = "https://raw.githack.com/fbxyz/respysive-slide/master/assets/css/sorbone.css"
+#  p.save_html("readme_example.html", theme="custom", custom_theme=custom_theme)

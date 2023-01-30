@@ -51,7 +51,8 @@ class Presentation:
             raise ValueError("If the theme is set to 'custom', a URL for the custom theme must be provided.")
 
         if custom_theme:
-            theme_link = f"<link rel='stylesheet' href='{custom_theme}' />"
+            theme_link = custom_theme
+            print(theme_link)
         else:
             theme_link = f"https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/theme/{theme}.min.css"
             print(theme_link)
@@ -69,7 +70,7 @@ class Presentation:
             "https://cdn.plot.ly/plotly-2.17.1.min.js"
         ]
 
-        css_links = "\n".join([f"<link href='{link}' rel='stylesheet'>" for link in css_links])
+        css_links = "\n".join([f"<link type='text/css' href='{link}' rel='stylesheet'>" for link in css_links])
         js_links = "\n".join([f"<script src='{link}' type='text/javascript'></script>" for link in js_links])
 
         slides_html = "\n".join([create_slide_html(slide) for slide in self.slides])
@@ -139,7 +140,7 @@ class Presentation:
             raise ValueError("If the theme is set to 'custom', a URL for the custom theme must be provided.")
 
         if custom_theme:
-            theme_link = f"<link rel='stylesheet' href='{custom_theme}' />"
+            theme_link = custom_theme
         else:
             theme_link = theme
 
