@@ -6,9 +6,12 @@ build-backend = "flit_core.buildapi"
 name = "respysive-slide"
 authors = [{name = "fbxyz"}]
 description = "A Python package that allows you to create interactive presentations using Python, Bootstrap and Reveal.js. Charts from Altair and Plotly can also be added"
+dependencies = [
+    'beautifulsoup4'
+]
 
 readme = "README.md"
-version = "1.1.2"
+version = "1.1.3"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 keywords = ["slide", "presentation", "reveal.js", "Bootstrap"]
