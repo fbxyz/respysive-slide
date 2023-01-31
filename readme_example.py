@@ -26,7 +26,7 @@ styles = [
 ]
 
 # Add the title page to the slide
-slide1.add_title_page(title_page_content, styles)
+slide1.add_title_page(title_page_content,styles)
 
 ## Slide 2 ##
 

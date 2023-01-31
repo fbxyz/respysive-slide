@@ -224,10 +224,13 @@ class Slide:
 
         _check_styles(styles, title_page_content)
 
-        title_s = _parse_style_class(styles[0])
-        subtitle_s = _parse_style_class(styles[1])
-        authors_s = _parse_style_class(styles[2])
-        logo_s = _parse_style_class(styles[3])
+        if styles is None:
+            styles = []
+
+        title_s = _parse_style_class(styles[0]) if styles else ""
+        subtitle_s = _parse_style_class(styles[1]) if styles else ""
+        authors_s = _parse_style_class(styles[2]) if styles else ""
+        logo_s = _parse_style_class(styles[3]) if styles else ""
 
         title_html = f'<div class="row"><div class="col-12"><h1 {title_s}">{title}</h1></div></div>' if title else ''
         subtitle_html = f'<div class="row"><div class="col-12"><h2 {subtitle_s}">{subtitle}</h2></div></div>' if subtitle else ''
