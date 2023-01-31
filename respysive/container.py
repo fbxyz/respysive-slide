@@ -33,10 +33,10 @@ def _check_content_type(col: str):
         :type chart: plotly.graph_objs._figure.Figure
         """
         if isinstance(_col, str):
-            return """{"data":[{"customdata""" in _col
+            return """{"data":[{""" in _col
         elif isinstance(_col, dict):
             _col = json.dumps(_col)
-            return """{"data":[{"customdata""" in _col
+            return """{"data":[{""" in _col
 
     center = {'class': ['d-flex', 'justify-content-center', 'mx-auto']}
 

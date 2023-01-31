@@ -26,7 +26,7 @@ styles = [
 ]
 
 # Add the title page to the slide
-slide1.add_title_page(title_page_content,styles)
+slide1.add_title_page(title_page_content, styles)
 
 ## Slide 2 ##
 
@@ -196,7 +196,6 @@ p.add_slide([slide1, slide2, slide3, slide4, slide5, slide6, slide7, [slide8, sl
 # Saving the presentation in HTML format
 
 p.save_html("readme_example.html")
-
 
 #  custom_theme = "https://raw.githack.com/fbxyz/respysive-slide/master/assets/css/sorbone.css"
 #  p.save_html("readme_example.html", theme="custom", custom_theme=custom_theme)
