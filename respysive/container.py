@@ -184,6 +184,9 @@ class Slide:
 
         _check_styles(styles, cards)
 
+        if styles is None:
+            styles = [{'class': 'bg-info'}]*len(cards)
+
         cards_html = ""
         for card, style in zip(cards, styles):
             if 'class' not in style:
@@ -232,8 +235,8 @@ class Slide:
         authors_s = _parse_style_class(styles[2]) if styles else ""
         logo_s = _parse_style_class(styles[3]) if styles else ""
 
-        title_html = f'<div class="row"><div class="col-12"><h1 {title_s}">{title}</h1></div></div>' if title else ''
-        subtitle_html = f'<div class="row"><div class="col-12"><h2 {subtitle_s}">{subtitle}</h2></div></div>' if subtitle else ''
+        title_html = f'<div class="row"><div class="col-12"><h2 {title_s}">{title}</h2></div></div>' if title else ''
+        subtitle_html = f'<div class="row"><div class="col-12"><h3 {subtitle_s}">{subtitle}</h3></div></div>' if subtitle else ''
         authors_html = f'<div class="col-9"><h4 {authors_s}">{authors}</h3></div>' if authors else ''
         logo_html = f'<div class="col-3 "><img src="{logo}" {logo_s}"></div>' if logo else ''
         authors_logo_html = f'<div class="row align-items-center">{authors_html}{logo_html}</div>'

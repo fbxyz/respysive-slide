@@ -52,10 +52,8 @@ class Presentation:
 
         if custom_theme:
             theme_link = custom_theme
-            print(theme_link)
         else:
             theme_link = f"https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/theme/{theme}.min.css"
-            print(theme_link)
 
         css_links = [
             "https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.min.css",
