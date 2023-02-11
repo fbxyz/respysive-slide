@@ -63,7 +63,7 @@ class Presentation:
         ]
         js_links = [
             "https://cdn.jsdelivr.net/npm/vega@5",
-            "https://cdn.jsdelivr.net/npm/vega-lite@5",
+            "https://cdn.jsdelivr.net/npm/vega-lite@4.8",
             "https://cdn.jsdelivr.net/npm/vega-embed@6",
             "https://cdn.plot.ly/plotly-2.17.1.min.js"
         ]
