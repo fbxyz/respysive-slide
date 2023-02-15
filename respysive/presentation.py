@@ -17,6 +17,7 @@ class Presentation:
     """
     A class representing a presentation.
     """
+
     def __init__(self):
         self.slides = []
 
@@ -65,7 +66,9 @@ class Presentation:
             "https://cdn.jsdelivr.net/npm/vega@5",
             "https://cdn.jsdelivr.net/npm/vega-lite@4.8",
             "https://cdn.jsdelivr.net/npm/vega-embed@6",
-            "https://cdn.plot.ly/plotly-2.17.1.min.js"
+            "https://cdn.plot.ly/plotly-2.17.1.min.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"
         ]
 
         css_links = "\n".join([f"<link type='text/css' href='{link}' rel='stylesheet'>" for link in css_links])
@@ -89,30 +92,76 @@ class Presentation:
         </div>
         <!--Correction to allow transition between slides-->
         <style type='text/css'>[hidden] {{display: inherit !important;}}</style>
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.min.js'></script>
+        
         <script>
-         Reveal.initialize(
-                    {{center: false,
-                     pdfMaxPagesPerSlide: 1,
-                     pdfSeparateFragments: false,
-                     disableLayout: false,
-                     slideNumber: 'c/t',  
-                     
-                    // The "normal" size of the presentation, aspect ratio will be preserved
-                    // when the presentation is scaled to fit different resolutions. Can be
-                    // specified using percentage units.
-                    width: {width},
-                    height: {height},
-                    display:'block',
+        // from nbconvert
+        require(
+        {{
+          // it makes sense to wait a little bit when you are loading
+          // reveal from a cdn in a slow connection environment
+          waitSeconds: 15
+        }},
+        [
+          "https://unpkg.com/reveal.js@4.4.0/dist/reveal.js",
+          "https://unpkg.com/reveal.js@4.4.0/plugin/notes/notes.js"
+        ],
+    
+        function(Reveal, RevealNotes){{
+            // Full list of configuration options available here: https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({{
+                center: false,
+                pdfMaxPagesPerSlide: 1,
+                pdfSeparateFragments: false,
+                display:'block',
+                slideNumber: 'c/t',  
+                controls: true,
                 
-                    // Factor of the display size that should remain empty around the content
-                    margin: {margin},
-                
-                    // Bounds for smallest/largest possible scale to apply to content
-                    minScale: {minscale},
-                    maxScale: {maxscale},
-                    }});
-        </script>
+                progress: true,
+                history: true,
+                transition: "slide",
+    
+                plugins: [RevealNotes],
+                width: {width},
+                height: {height},
+                center: true,
+                // Factor of the display size that should remain empty around the content
+                margin: {margin},
+                    
+                // Bounds for smallest/largest possible scale to apply to content
+                minScale: {minscale},
+                maxScale: {maxscale},
+        }});
+          
+    
+            var update = function(event){{
+              if(MathJax.Hub.getAllJax(Reveal.getCurrentSlide())){{
+                MathJax.Hub.Rerender(Reveal.getCurrentSlide());
+              }}
+            }};
+    
+            Reveal.addEventListener('slidechanged', update);
+    
+            function setScrollingSlide() {{
+                var scroll = false
+                if (scroll === true) {{
+                  var h = $('.reveal').height() * 0.95;
+                  $('section.present').find('section')
+                    .filter(function() {{
+                      return $(this).height() > h;
+                    }})
+                    .css('height', 'calc(95vh)')
+                    .css('overflow-y', 'scroll')
+                    .css('margin-top', '20px');
+                }}
+            }}
+    
+            // check and set the scrolling slide every time the slide change
+            Reveal.addEventListener('slidechanged', setScrollingSlide);
+        }}
+        );
+    </script>
+        
+    
      </body>
     </html>"""
         soup = BeautifulSoup(presentation_html, "html.parser")
@@ -142,7 +191,8 @@ class Presentation:
         else:
             theme_link = theme
 
-        presentation_html = self.to_html(theme=theme_link, width=width, height=height, minscale=minscale, maxscale=maxscale,
+        presentation_html = self.to_html(theme=theme_link, width=width, height=height, minscale=minscale,
+                                         maxscale=maxscale,
                                          margin=margin, custom_theme=custom_theme)
 
         with open(file_name, "w") as f:

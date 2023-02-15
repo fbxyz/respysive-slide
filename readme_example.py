@@ -190,8 +190,21 @@ slide9.add_title("Horizontal and vertical slides")
 text = markdown("""This is a vertical slide""")
 slide9.add_content([text])
 
+## Slide 10 : Speaker View ##
+
+slide10 = Slide()
+slide10.add_title("Speaker view")
+text = markdown("""Press S for Speaker View""")
+sw = markdown("""
+  <aside class="notes">
+    This is a test for speaker view
+  </aside>
+""")
+slide10.add_content([text])
+slide10.add_content([sw])
+
 # Adding slide to the presentation
-p.add_slide([slide1, slide2, slide3, slide4, slide5, slide6, slide7, [slide8, slide9]])
+p.add_slide([slide1, slide2, slide3, slide4, slide5, slide6, slide7, [slide8, slide9], slide10])
 
 # Saving the presentation in HTML format
 

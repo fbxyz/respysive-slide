@@ -331,7 +331,7 @@ Just add ?print-pdf at the end of the url and open the in-browser print dialog :
 Best results are obtained with Chrome or Chromium
 
 ## Future features
-- add speaker view
+- add method for speaker view
 - offline presentation
 - better recognition of json plotly
 - prettify the final rendering
