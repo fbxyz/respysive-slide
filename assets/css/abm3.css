@@ -23,14 +23,14 @@ section.has-light-background, section.has-light-background h1, section.has-light
  * GLOBAL STYLES
  *********************************************/
 :root {
-  --r-background-color: #262773;
+  --r-background-color: #FFFFFF;
   --r-main-font: Lato, sans-serif;
   --r-main-font-size: 40px;
-  --r-main-color: #f1faee;
+  --r-main-color: #262773;
   --r-block-margin: 20px;
   --r-heading-margin: 0 0 20px 0;
   --r-heading-font: Franklin Gothic, sans-serif;
-  --r-heading-color: #f1faee;
+  --r-heading-color: #a2c617;
   --r-heading-line-height: 1.2;
   --r-heading-letter-spacing: normal;
   --r-heading-text-transform: uppercase;
@@ -42,15 +42,15 @@ section.has-light-background, section.has-light-background h1, section.has-light
   --r-heading3-size: 1.55em;
   --r-heading4-size: 1em;
   --r-code-font: monospace;
-  --r-link-color: #a2c616;
-  --r-link-color-dark: #6a810e;
-  --r-link-color-hover: #cdec56;
+  --r-link-color: #00566d;
+  --r-link-color-dark: #001a21;
+  --r-link-color-hover: #00a6d3;
   --r-selection-background-color: #a2c616;
   --r-selection-color: #fff;
 }
 
 .reveal-viewport {
-  background: #262773;
+  background: #FFFFFF;
   background-color: var(--r-background-color);
 }
 
@@ -417,4 +417,9 @@ section.has-light-background, section.has-light-background h1, section.has-light
   .line.right {
     width: 15px;
   }
+}
+
+.reveal .progress {
+  z-index: 1000;
+  color: #a2c617;
 }
