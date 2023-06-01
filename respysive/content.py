@@ -147,9 +147,12 @@ class Content:
 
         s = _parse_style_class(kwargs)
 
+        # avoid empty chart
+        j = json.replace("'", "\u2019")
+
         chart_id = "chart-" + str(uuid.uuid4())
         self.content += f"""<div {s} id='{chart_id}'></div>
-            <script>var Plotjson = '{json}';
+            <script>var Plotjson = '{j}';
             var figure = JSON.parse(Plotjson);
             Plotly.newPlot('{chart_id}', figure.data, figure.layout);</script>"""
 
