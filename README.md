@@ -232,7 +232,7 @@ plt.show()
 # add the  plot to the slide
 slide5_fig.add_content([fig], columns=[12])
 ```
-![slide5_fig.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/2Fslide5_fig.png)
+![slide5_fig.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide5_fig.png)
 
 It is **highly recommended** to set chart's width and height manually
 
