@@ -8,3 +8,6 @@ beautifulsoup4==4.11.1
     # via respysive-slide (pyproject.toml.old.old)
 soupsieve==2.3.2.post1
     # via beautifulsoup4
+
+matplotlib~=3.7.3
+requests~=2.31.0

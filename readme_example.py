@@ -133,6 +133,28 @@ j = chart.to_json()
 # add the scatter plot to the slide
 slide5.add_content([j], columns=[12])
 
+## Slide 5_fig : Matplotlib plot##
+slide5_fig = Slide()
+slide5_fig.add_title("Matplotlib")
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.arange(0,4*np.pi-1,0.1)   # start,stop,step
+y = np.sin(x)
+z = np.cos(x)
+
+plt.rcParams["figure.figsize"] = (8, 5)
+fig, ax = plt.subplots()
+plt.plot(x,y,x,z)
+plt.xlabel('x values')
+plt.title('sin and cos ')
+plt.legend(['sin(x)', 'cos(x)'])
+plt.show()
+
+# add the  plot to the slide
+slide5_fig.add_content([fig], columns=[12])
+
 ## Slide 6 : Bootstrap Cards ##
 slide6 = Slide()
 
@@ -204,7 +226,7 @@ slide10.add_content([text])
 slide10.add_content([sw])
 
 # Adding slide to the presentation
-p.add_slide([slide1, slide2, slide3, slide4, slide5, slide6, slide7, [slide8, slide9], slide10])
+p.add_slide([slide1, slide2, slide3, slide4, slide5, slide5_fig, slide6, slide7, [slide8, slide9], slide10])
 
 # Saving the presentation in HTML format
 

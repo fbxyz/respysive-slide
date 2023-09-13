@@ -143,9 +143,9 @@ slide3.add_content([text, url], columns=[7, 5], styles=css_txt)
 
 ![slide3.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide3.png)
 
-### Plotly and Altair
-Plotly or Altair graphs can be easily added with `add_content()`. Interactivity 
-is fully functional.
+### Plotly, Altair and Matplotlib
+Plotly, Altair or Matplotlib graphs can be easily added with `add_content()`. Interactivity 
+is fully functional for Plotly and Altair.
 
 ```python
 ## Slide 4 ##
@@ -206,6 +206,33 @@ j = chart.to_json()
 slide5.add_content([j], columns=[12])
 ```
 ![slide5.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide5.png)
+
+Matplotlib fig are automatically converted to svg
+
+```python
+## Slide 5_fig : Matplotlib plot##
+slide5_fig = Slide()
+slide5_fig.add_title("Matplotlib")
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.arange(0,4*np.pi-1,0.1)   # start,stop,step
+y = np.sin(x)
+z = np.cos(x)
+
+plt.rcParams["figure.figsize"] = (8, 5)
+fig, ax = plt.subplots()
+plt.plot(x,y,x,z)
+plt.xlabel('x values')
+plt.title('sin and cos ')
+plt.legend(['sin(x)', 'cos(x)'])
+plt.show()
+
+# add the  plot to the slide
+slide5_fig.add_content([fig], columns=[12])
+```
+![slide5_fig.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/2Fslide5_fig.png)
 
 It is **highly recommended** to set chart's width and height manually
 

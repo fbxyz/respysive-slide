@@ -3,6 +3,7 @@ from respysive import Content
 import os
 import re
 import json
+from matplotlib.figure import Figure
 
 
 def _check_content_type(col: str):
@@ -12,6 +13,17 @@ def _check_content_type(col: str):
     :param col: The content type to check
     :type col: str
     """
+
+    def _check_matplotlib(_col):
+        """
+        Check if the input is a Matplotlib figure
+
+        :param _col: The input to check
+        :type _col: matplotlib.figure.Figure
+        """
+        if isinstance(_col, Figure):
+            return _col
+
     def _check_altair(_col):
         """
         Check if the input is a Altair chart
@@ -40,8 +52,15 @@ def _check_content_type(col: str):
 
     center = {'class': ['d-flex', 'justify-content-center', 'mx-auto']}
 
-    if os.path.isfile(col):
-        if os.path.splitext(col)[1].lower() in ['.jpg', '.jpeg', '.png', '.gif', '.tif', '.apng', '.bmp', '.svg']:
+    img_list = ['.jpg', '.jpeg', '.png', '.gif', '.tif', '.apng', '.bmp', '.svg']
+
+    if _check_matplotlib(col):
+        c = Content()
+        c.add_fig(col, **center)
+        col = c.render()
+
+    elif os.path.isfile(col):
+        if os.path.splitext(col)[1].lower() in img_list:
             c = Content()
             c.add_image(col, **center)
             col = c.render()
@@ -67,7 +86,6 @@ def _check_content_type(col: str):
         c = Content()
         c.add_text(col)
         col = c.render()
-
     return col
 
 
@@ -126,6 +144,7 @@ class Slide:
     """
     A class representing a slide in a presentation.
     """
+
     def __init__(self, center=False, **kwargs):
         self.content = ""
         self.center = center
@@ -146,16 +165,18 @@ class Slide:
         c = Content()
         c.add_heading(text, tag, icon, **kwargs)
 
-
         row = "<div class='row'><div class='col-12 mx-auto'>"
         self.content += row + c.render() + "</div></div>"
 
     def add_content(self, content: list, columns=None, styles: list = None):
         """
-        Add content to the slide
-        :param content : list of strings
-        :param columns : list of int representing the size of each column
-        :param kwargs : list of additional css styles to apply to each column
+        Add content to the slide.
+
+        :param content: List of content items to add (strings, figures).
+        :param columns: List of integers representing the column size for each item.
+                       Defaults to [12] if not provided.
+        :param styles: List of style dictionaries to apply to each content item.
+                       The length must match the length of the 'content' list.
         """
 
         if columns is None:
@@ -166,7 +187,8 @@ class Slide:
         row = "<div class='row'>"
         for i in range(len(content)):
             col = content[i]
-            if isinstance(col, str):
+
+            if isinstance(col, (str, Figure)):
                 col = _check_content_type(col)
                 if styles and len(styles) > i:
                     col = f"<div class='col-md-{columns[i]}' {_parse_style_class(styles[i])}>{col}</div>"
@@ -185,7 +207,7 @@ class Slide:
         _check_styles(styles, cards)
 
         if styles is None:
-            styles = [{'class': 'bg-info'}]*len(cards)
+            styles = [{'class': 'bg-info'}] * len(cards)
 
         cards_html = ""
         for card, style in zip(cards, styles):

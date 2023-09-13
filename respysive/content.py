@@ -1,4 +1,8 @@
 from bs4 import BeautifulSoup
+import requests
+from matplotlib.figure import Figure
+from io import BytesIO
+import base64
 import uuid
 from respysive.utils import _parse_style_class
 
@@ -7,6 +11,7 @@ class Content:
     """
     A class representing a slide content.
     """
+
     def __init__(self):
 
         self.content = ""
@@ -88,7 +93,7 @@ class Content:
     def add_image(self, src: str, alt: str = "", **kwargs):
         """
         Add an image element to the HTML document.
-        :param src: The source of the image.
+        :param src: The source of the image (local file path or URL).
         :param alt: The alternative text for the image.
         :param kwargs: Additional CSS styles and html class to apply to the image. (optional)
                 The keys should be in the format of CSS property names with '_' instead of '-', example: font_size
@@ -103,11 +108,24 @@ class Content:
             kwargs['class'] = [kwargs['class']]
         kwargs['class'].append('img-fluid')
 
+        if src.startswith(('http://', 'https://')):
+            response = requests.get(src)
+            if response.status_code == 200:
+                image_data = response.content
+            else:
+                raise Exception(f"Failed to fetch image from URL: {src}")
+        else:
+            with open(src, "rb") as f:
+                image_data = f.read()
+
+        image_base64 = base64.b64encode(image_data).decode("utf-8")
+        image_src = f"data:image/png;base64,{image_base64}"
+
         s = _parse_style_class(kwargs)
+        self.content += f"""<img src="{image_src}" alt="{alt}" {s}>"""
+        # self.content += f"<img data-src='{src}' alt='{alt}' {s}>"
 
-        self.content += f"<img data-src='{src}' alt='{alt}' {s}>"
-
-    def add_svg(self, svg: str,  **kwargs):
+    def add_svg(self, svg: str, **kwargs):
         """
         Add a svg to the document.
         :param svg : The code of the svg.
@@ -193,6 +211,40 @@ class Content:
 
         s = _parse_style_class(kwargs)
         self.content += f"""<div {s}>{div}</div>"""
+
+    def add_fig(self, src: Figure, alt: str = "", as_svg=True, **kwargs):
+        """
+        Add an image element to the HTML document from a Matplotlib Figure.
+        :param as_svg: Whether to save the figure as SVG or PNG.
+        :param src: The Matplotlib Figure object.
+        :param alt: The alternative text for the image.
+        :param kwargs: Additional CSS styles and HTML class to apply to the image.
+                       The keys should be in the format of CSS property names with '_' instead of '-',
+                       for example: font_size.
+                       You can also pass the 'class' key with a string or a list of strings.
+                       Example: {'font_size': '20px', 'color': 'blue', 'class': 'my-class'} or
+                                {'font_size': '20px', 'color': 'blue', 'class': ['my-class', 'my-second-class']}
+        """
+        if 'class' not in kwargs:
+            kwargs['class'] = []
+        elif isinstance(kwargs['class'], str):
+            kwargs['class'] = [kwargs['class']]
+        kwargs['class'].append('img-fluid')
+        s = _parse_style_class(kwargs)
+
+        buffer = BytesIO()
+        if as_svg:
+            src.savefig(buffer, format='svg')
+            svg = buffer.getvalue()
+            svg = svg.replace(b'\n', b'').decode('utf-8')
+            self.content += f"""<div {s}>{svg}</div>"""
+        else:
+            src.savefig(buffer, format='png')
+            image_data = buffer.getvalue()
+            image_base64 = base64.b64encode(image_data).decode("utf-8")
+            image_src = f"data:image/png;base64,{image_base64}"
+            self.content += f"""<img src="{image_src}" alt="{alt}" {s}>"""
+        buffer.close()
 
     def render(self):
         """
