@@ -358,6 +358,10 @@ section.has-light-background, section.has-light-background h1, section.has-light
   color: var(--r-link-color);
 }
 
+.reveal .slide-number {
+  z-index: 10000;
+}
+
 /*********************************************
  * PRINT BACKGROUND
  *********************************************/
