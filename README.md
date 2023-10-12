@@ -2,7 +2,7 @@
 ___
 A Python package that allows you to create interactive presentations using Python, 
 Bootstrap and Reveal.js. 
-Charts from Altair and Plotly can also be added.
+Charts from Matplotlib Altair and Plotly can be easily added.
 
 ![respysiv.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/respysiv.png)
 
