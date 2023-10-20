@@ -336,7 +336,7 @@ Different <a href="https://revealjs.com/themes/" target="_blank">Reveal.js theme
 and parameters can be added :
 
 ```python
-P.save_html(file_name,
+p.save_html(file_name,
             theme="moon",
             width=960,
             height=600,
