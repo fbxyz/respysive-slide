@@ -336,14 +336,14 @@ Different <a href="https://revealjs.com/themes/" target="_blank">Reveal.js theme
 and parameters can be added :
 
 ```python
-Presentation.add_slide(file_name,
-                       theme="moon",
-                       width=960,
-                       height=600,
-                       minscale=0.2,
-                       maxscale=1.5,
-                       margin=0.1,
-                       custom_theme=None)  # If theme="custom", pass here the custom css url 
+P.save_html(file_name,
+            theme="moon",
+            width=960,
+            height=600,
+            minscale=0.2,
+            maxscale=1.5,
+            margin=0.1,
+            custom_theme=None)  # If theme="custom", pass here the custom css url 
 ```
 
 Note that you need an internet connection to show your Slides !
