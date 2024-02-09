@@ -1,15 +1,9 @@
-/**
- * Solarized Dark theme for reveal.js.
- * Author: Achim Staebler
- */
 @import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
 @import url("https://fonts.cdnfonts.com/css/geograph-edit-black");
 @font-face {
   font-family: "Geomanist", sans-serif;
 }
-/**
- * Solarized colors by Ethan Schoonover
- */
+
 html * {
   color-profile: sRGB;
   rendering-intent: auto;
