@@ -69,6 +69,8 @@ class Presentation:
             "https://cdn.plot.ly/plotly-2.17.1.min.js",
             "https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js",
             "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"
+            "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+            
         ]
 
         css_links = "\n".join([f"<link type='text/css' href='{link}' rel='stylesheet'>" for link in css_links])
