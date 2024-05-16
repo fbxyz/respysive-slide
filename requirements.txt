@@ -5,9 +5,44 @@
 #    pip-compile pyproject.toml
 #
 beautifulsoup4==4.11.1
-    # via respysive-slide (pyproject.toml.old.old)
+    # via respysive-slide (pyproject.toml)
+certifi==2024.2.2
+    # via requests
+charset-normalizer==3.3.2
+    # via requests
+contourpy==1.1.1
+    # via matplotlib
+cycler==0.12.1
+    # via matplotlib
+fonttools==4.51.0
+    # via matplotlib
+idna==3.7
+    # via requests
+importlib-resources==6.4.0
+    # via matplotlib
+kiwisolver==1.4.5
+    # via matplotlib
+matplotlib==3.7.5
+    # via respysive-slide (pyproject.toml)
+numpy==1.24.4
+    # via
+    #   contourpy
+    #   matplotlib
+packaging==24.0
+    # via matplotlib
+pillow==10.3.0
+    # via matplotlib
+pyparsing==3.1.2
+    # via matplotlib
+python-dateutil==2.9.0.post0
+    # via matplotlib
+requests==2.31.0
+    # via respysive-slide (pyproject.toml)
+six==1.16.0
+    # via python-dateutil
 soupsieve==2.3.2.post1
     # via beautifulsoup4
-
-matplotlib~=3.7.3
-requests~=2.31.0
+urllib3==2.2.1
+    # via requests
+zipp==3.18.2
+    # via importlib-resources

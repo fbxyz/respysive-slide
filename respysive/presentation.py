@@ -68,7 +68,7 @@ class Presentation:
             "https://cdn.jsdelivr.net/npm/vega-embed@6",
             "https://cdn.plot.ly/plotly-2.17.1.min.js",
             "https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js",
-            "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"
+            "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js",
             "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
             
         ]
