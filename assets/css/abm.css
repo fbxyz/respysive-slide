@@ -3,9 +3,9 @@
  * Author: Achim Staebler
  */
 @import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
-@import url("https://fonts.cdnfonts.com/css/franklin-gothic");
+@import url("https://fonts.cdnfonts.com/css/geograph-edit-black");
 @font-face {
-  font-family: "Franklin Gothic", sans-serif;
+  font-family: "Geomanist", sans-serif;
 }
 /**
  * Solarized colors by Ethan Schoonover
@@ -23,34 +23,34 @@ section.has-light-background, section.has-light-background h1, section.has-light
  * GLOBAL STYLES
  *********************************************/
 :root {
-  --r-background-color: #00a4e2;
+  --r-background-color: #008acf;
   --r-main-font: Lato, sans-serif;
   --r-main-font-size: 40px;
-  --r-main-color: #f1faee;
+  --r-main-color: #FFFFFF;
   --r-block-margin: 20px;
   --r-heading-margin: 0 0 20px 0;
-  --r-heading-font: Franklin Gothic, sans-serif;
-  --r-heading-color: #f1faee;
+  --r-heading-font: Geomanist, sans-serif;
+  --r-heading-color: #FFFFFF;
   --r-heading-line-height: 1.2;
   --r-heading-letter-spacing: normal;
   --r-heading-text-transform: uppercase;
-  --r-heading-text-shadow: none;
-  --r-heading-font-weight: normal;
+  --r-heading-text-shadow: #fab200;
+  --r-heading-font-weight: 700;
   --r-heading1-text-shadow: none;
   --r-heading1-size: 3.77em;
   --r-heading2-size: 2.11em;
   --r-heading3-size: 1.55em;
   --r-heading4-size: 1em;
   --r-code-font: monospace;
-  --r-link-color: #a2c616;
-  --r-link-color-dark: #6a810e;
-  --r-link-color-hover: #cdec56;
-  --r-selection-background-color: #a2c616;
+  --r-link-color: #FFFFFF;
+  --r-link-color-dark: #d9d9d9;
+  --r-link-color-hover: white;
+  --r-selection-background-color: #5ca292;
   --r-selection-color: #fff;
 }
 
 .reveal-viewport {
-  background: #00a4e2;
+  background: #008acf;
   background-color: var(--r-background-color);
 }
 
@@ -366,3 +366,76 @@ section.has-light-background, section.has-light-background h1, section.has-light
     background-color: var(--r-background-color);
   }
 }
+.line {
+  content: "";
+  position: fixed;
+  background: 8acf;
+  z-index: 105;
+}
+.line.top {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 30px;
+}
+@media (max-width: 840px) {
+  .line.top {
+    height: 15px;
+  }
+}
+.line.bottom {
+  left: 0;
+  top: auto;
+  bottom: 0;
+  width: 100%;
+  height: 30px;
+}
+@media (max-width: 840px) {
+  .line.bottom {
+    height: 15px;
+  }
+}
+.line.left {
+  left: 0;
+  top: 0;
+  width: 30px;
+  height: 200%;
+}
+@media (max-width: 840px) {
+  .line.left {
+    width: 15px;
+  }
+}
+.line.right {
+  left: auto;
+  right: 0;
+  top: 0;
+  width: 30px;
+  height: 200%;
+}
+@media (max-width: 840px) {
+  .line.right {
+    width: 15px;
+  }
+}
+
+.reveal .progress {
+  z-index: 1000;
+  color: #FFFFFF;
+}
+
+.reveal:before {
+  content: "";
+  position: absolute;
+  bottom: 40%;
+  left: calc(66% - 20px);
+  transform: translateX(-0%);
+  width: 80%;
+  height: 80%;
+  background-color: transparent;
+  z-index: -1;
+  background-image: url("https://raw.githubusercontent.com/fbxyz/pratik/main/elem_abm.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
