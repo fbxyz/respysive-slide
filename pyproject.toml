@@ -11,7 +11,7 @@ dependencies = [
 ]
 
 readme = "README.md"
-version = "1.1.9"
+version = "1.1.10"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 keywords = ["slide", "presentation", "reveal.js", "Bootstrap"]
