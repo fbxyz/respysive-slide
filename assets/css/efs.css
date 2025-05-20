@@ -1,12 +1,13 @@
 /**
  * Theme EFS pour reveal.js.
- * Adapté selon la charte graphique EFS 2022
  */
-@import url('https://fonts.googleapis.com/css2?family=Gotham:wght@400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap');
-
+@import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
+@import url("https://fonts.cdnfonts.com/css/geograph-edit-black");
+@font-face {
+  font-family: "Geomanist", sans-serif;
+}
 /**
- * Couleurs EFS selon la charte graphique institutionnelle
+ * Couleurs EFS selon la charte graphique
  */
 html * {
   color-profile: sRGB;
@@ -14,48 +15,41 @@ html * {
 }
 
 section.has-light-background, section.has-light-background h1, section.has-light-background h2, section.has-light-background h3, section.has-light-background h4, section.has-light-background h5, section.has-light-background h6 {
-  color: #002f6c;
+  color: #484847;
 }
 
 /*********************************************
  * GLOBAL STYLES
  *********************************************/
 :root {
-  /* Couleurs principales EFS */
   --r-background-color: #FFFFFF;
-  --r-main-font: Arial, sans-serif;
-  --r-main-font-size: 24px;
-  --r-main-color: #484847; /* Noir à 85% pour les textes courants */
+  --r-main-font: Lato, sans-serif;
+  --r-main-font-size: 40px;
+  --r-main-color: #002f6c;
   --r-block-margin: 20px;
   --r-heading-margin: 0 0 20px 0;
-  --r-heading-font: 'Gotham', Arial, sans-serif;
-  --r-heading-color: #002f6c; /* Bleu institutionnel Pantone 281 C */
+  --r-heading-font: Gotham, Arial, sans-serif;
+  --r-heading-color: #002f6c;
   --r-heading-line-height: 1.2;
   --r-heading-letter-spacing: normal;
-  --r-heading-text-transform: none;
+  --r-heading-text-transform: uppercase;
   --r-heading-text-shadow: none;
   --r-heading-font-weight: 700;
   --r-heading1-text-shadow: none;
-  --r-heading1-size: 2.5em;
-  --r-heading2-size: 1.8em;
-  --r-heading3-size: 1.4em;
-  --r-heading4-size: 1.2em;
+  --r-heading1-size: 3.77em;
+  --r-heading2-size: 2.11em;
+  --r-heading3-size: 1.55em;
+  --r-heading4-size: 1em;
   --r-code-font: monospace;
-  --r-link-color: #e30015; /* Rouge institutionnel Pantone 485 C */
-  --r-link-color-dark: #c50012;
-  --r-link-color-hover: #e30015;
-  --r-selection-background-color: #002f6c;
+  --r-link-color: #002f6c;
+  --r-link-color-dark: #000e20;
+  --r-link-color-hover: #005bd2;
+  --r-selection-background-color: #009ee3;
   --r-selection-color: #fff;
-  
-  /* Couleurs additionnelles EFS */
-  --efs-blue: #002f6c; /* Pantone 281 C */
-  --efs-red: #e30015; /* Pantone 485 C */
-  --efs-gray: #ececed; /* Gris (Noir tramé à 10 %) */
-  --efs-white: #ffffff;
 }
 
 .reveal-viewport {
-  background: var(--r-background-color);
+  background: #FFFFFF;
   background-color: var(--r-background-color);
 }
 
@@ -106,7 +100,6 @@ section.has-light-background, section.has-light-background h1, section.has-light
 
 .reveal h1 {
   font-size: var(--r-heading1-size);
-  text-transform: uppercase;
 }
 
 .reveal h2 {
@@ -207,7 +200,7 @@ section.has-light-background, section.has-light-background h1, section.has-light
   margin: var(--r-block-margin) auto;
   padding: 5px;
   font-style: italic;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.05);
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
 }
 
@@ -353,7 +346,7 @@ section.has-light-background, section.has-light-background h1, section.has-light
  * NAVIGATION CONTROLS
  *********************************************/
 .reveal .controls {
-  color: var(--efs-red);
+  color: var(--r-link-color);
 }
 
 /*********************************************
@@ -361,7 +354,7 @@ section.has-light-background, section.has-light-background h1, section.has-light
  *********************************************/
 .reveal .progress {
   background: rgba(0, 0, 0, 0.2);
-  color: var(--efs-red);
+  color: var(--r-link-color);
 }
 
 /*********************************************
@@ -372,163 +365,47 @@ section.has-light-background, section.has-light-background h1, section.has-light
     background-color: var(--r-background-color);
   }
 }
-
-/* EFS specific styling */
-.line {
+.reveal::after {
   content: "";
   position: fixed;
-  background: var(--efs-red);
-  z-index: 105;
-}
-
-.line.top {
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 5px;
-}
-
-.line.bottom {
-  left: 0;
-  top: auto;
   bottom: 0;
+  left: 0;
   width: 100%;
-  height: 5px;
-}
-
-/* Logo EFS en bas à droite */
-.reveal .slide-footer {
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
+  height: 70px;
+  background-color: #002f6c;
   z-index: 100;
-  font-size: 0.5em;
-  color: var(--efs-blue);
 }
 
-/* Template spécifique pour slide de titre */
-.reveal .title-slide h1 {
-  color: var(--efs-blue);
+.line {
+  display: none;
+}
+
+.reveal .progress {
+  z-index: 1000;
+  color: #e30015;
+  height: 5px;
+  bottom: 70px;
+}
+
+.reveal:before {
+  display: none;
+}
+
+.reveal h1, .reveal h2 {
+  color: #002f6c;
+  font-family: "Gotham", "Arial", sans-serif;
   font-weight: bold;
   text-transform: uppercase;
 }
 
-.reveal .title-slide h2 {
-  color: var(--efs-blue);
-  font-style: italic;
+.reveal h3, .reveal h4 {
+  color: #002f6c;
+  font-family: "Freight Macro", "Arial", serif;
+  font-weight: semi-bold;
 }
 
-/* Styles pour la ligne rouge caractéristique de l'EFS */
-.red-line {
-  position: absolute;
-  height: 5px;
-  background-color: var(--efs-red);
-  width: 60%;
-  left: 20%;
-  top: 45%;
-  z-index: 1;
-}
-
-/* Styles pour les chapitres */
-.reveal .chapter-slide {
-  background-color: var(--efs-blue);
-}
-
-.reveal .chapter-slide h1, 
-.reveal .chapter-slide h2 {
-  color: white;
-}
-
-.reveal .chapter-number {
-  font-size: 1.5em;
-  color: var(--efs-red);
-  padding: 10px;
-}
-
-/* Style pour les blocs de citations */
-.reveal blockquote {
-  border-left: 4px solid var(--efs-red);
-  padding-left: 20px;
-  font-family: 'Freight Macro', serif;
-  font-style: italic;
-}
-
-/* Style pour les sous-parties */
-.reveal .section {
-  margin-bottom: 30px;
-}
-
-.reveal .section-title {
-  color: var(--efs-blue);
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-/* Style pour la page de contact */
-.reveal .contact-slide {
-  text-align: center;
-}
-
-.reveal .contact-slide h1 {
-  color: var(--efs-red);
-  font-size: 3em;
-  margin-bottom: 40px;
-}
-
-.reveal .contact-info {
-  font-size: 1.2em;
-  line-height: 1.5;
-}
-
-.reveal .contact-info p {
-  margin: 5px;
-}
-
-/* Les listes de la diapo "Sommaire" */
-.reveal .toc-slide ul {
-  list-style-type: none;
-}
-
-.reveal .toc-slide li {
-  margin-bottom: 15px;
-}
-
-.reveal .toc-slide .chapter {
-  font-weight: bold;
-  color: var(--efs-blue);
-}
-
-.reveal .toc-slide .subitem {
-  margin-left: 25px;
-  color: var(--efs-red);
-}
-
-/* Fond globules pour certaines slides */
-.reveal .globules-background {
-  background-image: url('path/to/globules-background.jpg');
-  background-size: cover;
-  background-position: center;
-}
-
-/* Ajout d'un effet pour la ligne rouge dynamique */
-@keyframes redLineAnimation {
-  0% {
-    width: 0;
-    opacity: 0;
-  }
-  100% {
-    width: 100%;
-    opacity: 1;
-  }
-}
-
-.animated-red-line {
-  position: absolute;
-  height: 5px;
-  background-color: var(--efs-red);
-  width: 0;
-  left: 0;
-  top: 45%;
-  z-index: 1;
-  animation: redLineAnimation 1.5s ease-in-out forwards;
+.reveal p {
+  color: #484847;
+  font-family: "Gotham", "Arial", sans-serif;
+  font-weight: normal;
 }
