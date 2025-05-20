@@ -1,3 +1,4 @@
+
 /**
  * Theme EFS pour reveal.js.
  */
@@ -405,7 +406,7 @@ section.has-light-background, section.has-light-background h1, section.has-light
 }
 
 .reveal p {
-  color: #e30015;
+  color: #002f6c;
   font-family: "Gotham", "Arial", sans-serif;
   font-weight: normal;
 }
