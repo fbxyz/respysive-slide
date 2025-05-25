@@ -38,17 +38,56 @@ def _check_content_type(col: str):
             return "https://vega.github.io/schema/vega-lite" in _col
 
     def _check_plotly(_col):
-        """
-        Check if the input is a Plotly chart
 
-        :param chart: The chart to check
-        :type chart: plotly.graph_objs._figure.Figure
-        """
+        def _is_plotly_structure(data):
+
+            if not isinstance(data, dict):
+                return False
+
+            if 'data' not in data:
+                return False
+
+            if not isinstance(data['data'], list):
+                return False
+
+            if len(data['data']) > 0:
+                plotly_types = {
+                    'scatter', 'bar', 'line', 'histogram', 'box', 'violin',
+                    'heatmap', 'contour', 'surface', 'mesh3d', 'scatter3d',
+                    'choropleth', 'scattergeo', 'pie', 'sunburst', 'treemap',
+                    'sankey', 'waterfall', 'funnel', 'indicator', 'scattergl',
+                    'histogram2d', 'histogram2dcontour', 'parcoords', 'parcats'
+                }
+
+                for trace in data['data']:
+                    if isinstance(trace, dict) and 'type' in trace:
+                        if trace['type'] in plotly_types:
+                            return True
+                    elif isinstance(trace, dict) and any(
+                            key in trace for key in ['x', 'y', 'z', 'locations', 'values']):
+                        return True
+
+            return 'layout' in data
+
         if isinstance(_col, str):
-            return """{"data":[{""" in _col
+            try:
+                parsed_data = json.loads(_col)
+                return _is_plotly_structure(parsed_data)
+            except (json.JSONDecodeError, ValueError):
+                return '{"data":[{' in col or '"data":' in _col
+
         elif isinstance(_col, dict):
-            _col = json.dumps(_col)
-            return """{"data":[{""" in _col
+            return _is_plotly_structure(_col)
+
+        else:
+            try:
+                # Vérifier si c'est un objet Figure de plotly
+                if hasattr(_col, 'to_json') and hasattr(_col, 'data') and hasattr(_col, 'layout'):
+                    return True
+            except:
+                pass
+
+        return False
 
     center = {'class': ['d-flex', 'justify-content-center', 'mx-auto']}
 
@@ -191,9 +230,9 @@ class Slide:
             if isinstance(col, (str, Figure)):
                 col = _check_content_type(col)
                 if styles and len(styles) > i:
-                    col = f"<div class='col-md-{columns[i]}' {_parse_style_class(styles[i])}>{col}</div>"
+                    col = f"<div class='col-md-{columns[i]} responsive-text' {_parse_style_class(styles[i])}>{col}</div>"
                 else:
-                    col = f"<div class='col-md-{columns[i]}'>{col}</div>"
+                    col = f"<div class='col-md-{columns[i]} responsive-text'>{col}</div>"
             row += col
         self.content += row + "</div>"
 

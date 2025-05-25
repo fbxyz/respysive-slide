@@ -16,5 +16,5 @@ def _parse_style_class(style: dict):
                     style_str += f"{css_key}: {value};"
                 else:
                     raise ValueError(f"Invalid value for {key}, the value must be a string, int or float")
-        return f"style='{style_str}' {class_str}"
+        return f"style='{style_str}' {class_str}'"
     return ""
