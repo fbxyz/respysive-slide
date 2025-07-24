@@ -1,4 +1,4 @@
-from respysive.utils import _parse_style_class
+from respysive.utils import _parse_style_class, process_markdown_with_latex
 from respysive import Content
 import os
 import re
@@ -122,9 +122,20 @@ def _check_content_type(col: str):
         col = c.render()
 
     else:
-        c = Content()
-        c.add_text(col)
-        col = c.render()
+        if ('$' in col or '#' in col or '*' in col or '_' in col or '[' in col) and not ('\\(' in col or '\\[' in col):
+            processed_text = process_markdown_with_latex(col)
+            c = Content()
+            c.add_div(processed_text)
+            col = c.render()
+        else:
+            c = Content()
+            if '\\(' in col or '\\[' in col or '<' in col:
+                # Already processed HTML/LaTeX, use as div
+                c.add_div(col)
+            else:
+                # Plain text
+                c.add_text(col)
+            col = c.render()
     return col
 
 

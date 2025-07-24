@@ -236,12 +236,37 @@ slide5_fig.add_content([fig], columns=[12])
 
 It is **highly recommended** to set chart's width and height manually
 
+### LaTeX Support
+
+You can use LaTeX mathematical expressions in your slides. The package automatically detects and processes LaTeX syntax:
+
+```python
+## Slide 6 : LaTeX equations ##
+slide6 = Slide()
+slide6.add_title("Mathematical Equations")
+
+# Text with LaTeX expressions
+math_content = """
+The Gaussian function $f(x) = e^{-x^2}$ or in display mode:
+
+$$f(x) = e^{-x^2}$$
+"""
+
+slide6.add_content([math_content], columns=[12])
+```
+
+The LaTeX processing is automatic when you include `$` or `$$` delimiters in your text content.
+
+To display LaTeX syntax without processing (like in documentation), escape with backticks:
+- Inline: `` `$f(x) = e^{-x^2}$` ``
+- Display: `` `$$f(x) = e^{-x^2}$$` ``
+
 ### Bootstrap Cards
 Bootstrap Cards can also be added with `add_card()` method.
 
 ```python
-## Slide 6 : Bootstrap Cards ##
-slide6 = Slide()
+## Slide 7 : Bootstrap Cards ##
+slide7 = Slide()
 
 # card 1 content
 txt_card1 = markdown("""
@@ -264,8 +289,8 @@ styles_list = [{'font-size': '20px', 'color': '#1d3557', 'class': 'bg-danger'},
                {'font-size': '20px', 'color': '#f1faee', 'class': 'bg-info'}]
 
 # add title and card to slide
-slide6.add_title("Bootstrap cards can be added")
-slide6.add_card(cards, styles_list)
+slide7.add_title("Bootstrap cards can be added")
+slide7.add_card(cards, styles_list)
 ```
 
 ![slide6.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide6.png)
@@ -277,7 +302,7 @@ the Slide() method with a kwarg
 
 ```python
 
-## Slide 7 : Background ##
+## Slide 8 : Background ##
 bckgnd_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Frost_patterns_2.jpg/1920px-Frost_patterns_2.jpg"
 
 # Create a dictionary with slide kwargs
@@ -287,30 +312,30 @@ slide_kwargs = {
 }
 
 # Create a slide object with slide kwargs
-slide7 = Slide(center=True, **slide_kwargs)
+slide8 = Slide(center=True, **slide_kwargs)
 
 css_background = {"class": "text-center", "color": "#e63946", "background-color":"#f1faee"}
-slide7.add_title("Image  background", **css_background)
+slide8.add_title("Image  background", **css_background)
 ```
 
 ![slide7.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide7.png)
 
 ### Vertical slides
 
-You can add vertical slides. First, let's create slide 8 (horizontal one) and slide 9 (vertical one)
+You can add vertical slides. First, let's create slide 9 (horizontal one) and slide 10 (vertical one)
 
 ```python
-## Slide 8 and 9 : Vertical slide ##
-slide8 = Slide()
+## Slide 9 and 10 : Vertical slide ##
+slide9 = Slide()
 text = markdown("""Press arrow down to show vertical slide""")
-slide8.add_title("Horizontal and vertical slides")
-slide8.add_content([text])
-
-## Slide 8 and 9 : Vertical slide ##
-slide9 = Slide(center=True)
 slide9.add_title("Horizontal and vertical slides")
-text = markdown("""This is a vertical slide""")
 slide9.add_content([text])
+
+## Slide 9 and 10 : Vertical slide ##
+slide10 = Slide(center=True)
+slide10.add_title("Horizontal and vertical slides")
+text = markdown("""This is a vertical slide""")
+slide10.add_content([text])
 ```
 
 They will be added as list in the next method to export your presentation
@@ -324,13 +349,13 @@ The `Presentation.add_slide()` method is used
 ```python
 
 # Adding slide to the presentation
-p.add_slide([slide1, slide2, slide3, slide4, slide5, slide6, slide7, [slide8, slide9]])
+p.add_slide([slide1, slide2, slide3, slide4, slide5, slide5_fig, slide6, slide7, slide8, [slide9, slide10]])
 
 # Saving the presentation in HTML format
 p.save_html("readme_example.html")
 ```
 
-As you can see, slides 8 and 9 are inside a list. That tels `respysive-slide` to create vertical slide
+As you can see, slides 9 and 10 are inside a list. That tells `respysive-slide` to create vertical slide
 
 Different <a href="https://revealjs.com/themes/" target="_blank">Reveal.js theme</a> 
 and parameters can be added :
@@ -347,6 +372,7 @@ p.save_html(file_name,
 ```
 
 Note that you need an internet connection to show your Slides !
+
 
 ### PDF Export
 

@@ -1,3 +1,6 @@
+import re
+
+
 def _parse_style_class(style: dict):
     if style:
         style_str = ""
@@ -18,3 +21,30 @@ def _parse_style_class(style: dict):
                     raise ValueError(f"Invalid value for {key}, the value must be a string, int or float")
         return f"style='{style_str}' {class_str}'"
     return ""
+
+
+def process_markdown_with_latex(text: str) -> str:
+    """
+    Process markdown text with LaTeX math support.
+    Converts $...$ to inline math and $$...$$ to display math.
+    """
+    try:
+        import markdown
+        
+        # Convert LaTeX expressions directly to MathJax format first  
+        text = re.sub(r'\$\$(.*?)\$\$', r'\\\\[\1\\\\]', text, flags=re.DOTALL)
+        text = re.sub(r'\$(.*?)\$', r'\\\\(\1\\\\)', text)
+        
+        # Then process markdown
+        md = markdown.Markdown(extensions=['extra', 'codehilite'])
+        html = md.convert(text)
+            
+        return html
+        
+    except ImportError:
+        # Fallback if markdown is not available
+        text = re.sub(r'\$\$(.*?)\$\$', r'\\\\[\1\\\\]', text, flags=re.DOTALL)
+        text = re.sub(r'\$(.*?)\$', r'\\\\(\1\\\\)', text)
+        return text.replace('\n', '<br>')
+        
+        

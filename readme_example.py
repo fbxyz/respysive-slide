@@ -155,8 +155,21 @@ plt.show()
 # add the  plot to the slide
 slide5_fig.add_content([fig], columns=[12])
 
-## Slide 6 : Bootstrap Cards ##
+## Slide 6 : LaTeX equations ##
 slide6 = Slide()
+slide6.add_title("Mathematical Equations")
+
+# Text with LaTeX expressions
+math_content = """
+The Gaussian function $f(x) = e^{-x^2}$ or in display mode:
+
+$$f(x) = e^{-x^2}$$
+"""
+
+slide6.add_content([math_content], columns=[12])
+
+## Slide 7 : Bootstrap Cards ##
+slide7 = Slide()
 
 # card 1 content
 txt_card1 = markdown("""
@@ -179,10 +192,10 @@ styles_list = [{'font-size': '20px', 'color': '#1d3557', 'class': 'bg-danger'},
                {'font-size': '20px', 'color': '#f1faee', 'class': 'bg-info'}]
 
 # add title and card to slide
-slide6.add_title("Bootstrap cards can be added")
-slide6.add_card(cards, styles_list)
+slide7.add_title("Bootstrap cards can be added")
+slide7.add_card(cards, styles_list)
 
-## Slide 7 : Background ##
+## Slide 8 : Background ##
 
 # Create a dictionary with slide kwargs
 
@@ -193,40 +206,40 @@ slide_kwargs = {
 }
 
 # Create a slide object with slide kwargs
-slide7 = Slide(center=True, **slide_kwargs)
+slide8 = Slide(center=True, **slide_kwargs)
 
 css_background = {"class": "text-center", "color": "#e63946", "background-color": "#f1faee"}
-slide7.add_title("Image  background", **css_background)
+slide8.add_title("Image  background", **css_background)
 
-## Slide 8 and 9 : Vertical slide ##
+## Slide 9 and 10 : Vertical slide ##
 
-slide8 = Slide()
+slide9 = Slide()
 text = markdown("""Press arrow down to show vertical slide""")
-slide8.add_title("Horizontal and vertical slides")
-slide8.add_content([text])
-
-## Slide 8 and 9 : Vertical slide ##
-
-slide9 = Slide(center=True)
 slide9.add_title("Horizontal and vertical slides")
-text = markdown("""This is a vertical slide""")
 slide9.add_content([text])
 
-## Slide 10 : Speaker View ##
+## Slide 9 and 10 : Vertical slide ##
 
-slide10 = Slide()
-slide10.add_title("Speaker view")
+slide10 = Slide(center=True)
+slide10.add_title("Horizontal and vertical slides")
+text = markdown("""This is a vertical slide""")
+slide10.add_content([text])
+
+## Slide 11 : Speaker View ##
+
+slide11 = Slide()
+slide11.add_title("Speaker view")
 text = markdown("""Press S for Speaker View""")
 sw = markdown("""
   <aside class="notes">
     This is a test for speaker view
   </aside>
 """)
-slide10.add_content([text])
-slide10.add_content([sw])
+slide11.add_content([text])
+slide11.add_content([sw])
 
 # Adding slide to the presentation
-p.add_slide([slide1, slide2, slide3, slide4, slide5, slide5_fig, slide6, slide7, [slide8, slide9], slide10])
+p.add_slide([slide1, slide2, slide3, slide4, slide5, slide5_fig, slide6, slide7, slide8, [slide9, slide10], slide11])
 
 # Saving the presentation in HTML format
 

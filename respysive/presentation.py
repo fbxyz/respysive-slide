@@ -152,8 +152,10 @@ class Presentation:
                     }});
 
                     var update = function(event){{
-                      if(MathJax.Hub.getAllJax(Reveal.getCurrentSlide())){{
-                        MathJax.Hub.Rerender(Reveal.getCurrentSlide());
+                      if(typeof MathJax !== 'undefined' && MathJax.typesetPromise){{
+                        MathJax.typesetPromise([Reveal.getCurrentSlide()]).catch(function(err) {{
+                          console.warn('MathJax typeset failed:', err);
+                        }});
                       }}
                     }};
 
