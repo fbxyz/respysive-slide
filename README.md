@@ -254,12 +254,10 @@ $$f(x) = e^{-x^2}$$
 
 slide6.add_content([math_content], columns=[12])
 ```
+![slide_latex.png](assets/img/slide_latex.png)
 
 The LaTeX processing is automatic when you include `$` or `$$` delimiters in your text content.
 
-To display LaTeX syntax without processing (like in documentation), escape with backticks:
-- Inline: `` `$f(x) = e^{-x^2}$` ``
-- Display: `` `$$f(x) = e^{-x^2}$$` ``
 
 ### Bootstrap Cards
 Bootstrap Cards can also be added with `add_card()` method.
