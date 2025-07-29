@@ -315,7 +315,7 @@ slide_maps.add_content([population_config, income_config],
 
 This approach stores the large `counties` GeoJSON data (~2MB) only once in a hidden div. Multiple maps can then reference this shared data using `shared_data_ids`, avoiding duplication and improving performance.
 
-![slide4b.png.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide4b.png.png)
+![slide4b.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide4b.png)
 
 #### Altair
 
