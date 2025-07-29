@@ -34,7 +34,7 @@ The package consists of two main classes: `Presentation` and `Slide`.
 
 Each `Slide` instance is added to the `Presentation` instance for final rendering.
 
-### Creating a new Presentation
+### Creating a new presentation
 Here's an example of how to use `respysive-slide`
 
 ```python
@@ -74,7 +74,7 @@ the add_title method takes a dictionary kwarg `styles` containing :
 
 ![slide1.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide1.png)
 
-### Split Title Page Layout
+### Split title page layout
 
 As an alternative to the classic title page, you can create a split layout with the title content on one side and custom content (logo, image, chart) on the other side using `add_split_title_page()`:
 
@@ -208,7 +208,6 @@ Plotly, Altair or Matplotlib graphs can be easily added with `add_content()`. In
 is fully functional for Plotly and Altair.
 
 ```python
-## Slide 4 ##
 slide4 = Slide()
 slide4.add_title("Plotly")
 
@@ -239,12 +238,13 @@ slide4.add_content([j], columns=[12], styles=css_txt)
 
 #### Sharing GeoJSON data between multiple Plotly charts
 
-You can optimize performance by sharing large data (like GeoJSON) between multiple charts by storing it once in a hidden div:
+You can optimize performance by sharing large data (like GeoJSON) between multiple charts across the entire presentation:
 
 ```python
-## Slide with shared GeoJSON ##
-slide_maps = Slide()
-slide_maps.add_title("Sharing GeoJSON data between multiple Plotly charts", **{'class': 'r-fit-text'})
+from respysive import Presentation, Slide, Content
+
+# Create presentation
+p = Presentation()
 
 # Load GeoJSON data
 from urllib.request import urlopen
@@ -254,8 +254,7 @@ with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-c
 
 # Load unemployment data
 import pandas as pd
-df_counties = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/fips-unemp-16.csv",
-                   dtype={"fips": str})
+df_counties = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/fips-unemp-16.csv", dtype={"fips": str})
 
 # Add additional columns with pandas
 import random
@@ -263,19 +262,22 @@ random.seed(42)
 df_counties['population'] = [random.randint(10000, 500000) for _ in range(len(df_counties))]
 df_counties['income'] = [random.randint(25000, 85000) for _ in range(len(df_counties))]
 
-# Store the GeoJSON data once per slide
-slide_maps.content_obj.add_shared_data("us_counties", counties, "geojson")
+# Add global GeoJSON data to presentation (shared across all slides)
+p.add_global_geojson("us_counties", counties)
+
+slide_maps = Slide()
+slide_maps.add_title("Sharing GeoJSON data between multiple Plotly charts", **{'class': 'r-fit-text'})
 
 # Add context text
 context_text = """
-Large counties GeoJSON data (~2MB) is shared only once in a hidden div.
+Large counties GeoJSON data (~2MB) is shared globally across the entire presentation
 """
 
 css_txt = [{'text-align': 'center', 'font-size': "70%"}]
 
 slide_maps.add_content([context_text], columns=[12], styles=css_txt)
 
-# Create first map - Random population using the shared GeoJSON 
+# Create first map - Random population using the global GeoJSON 
 population_config = {
     "data": [{
         "type": "choropleth",
@@ -291,7 +293,7 @@ population_config = {
     }
 }
 
-# Create second map - Random income using the shared GeoJSON 
+# Create second map - Random income using the global GeoJSON 
 income_config = {
     "data": [{
         "type": "choropleth",
@@ -307,20 +309,24 @@ income_config = {
     }
 }
 
-# Add the two maps side by side using shared_data_ids to reference the hidden GeoJSON
-slide_maps.add_content([population_config, income_config], 
-                      columns=[6, 6], 
-                      shared_data_ids=["us_counties", "us_counties"])
+# Create content objects using global GeoJSON
+content_pop = Content()
+content_pop.add_optimized_plotly(population_config, "us_counties")
+
+content_income = Content()
+content_income.add_optimized_plotly(income_config, "us_counties")
+
+# Add the two maps side by side
+slide_maps.add_content([content_pop.render(), content_income.render()], columns=[6, 6])
 ```
 
-This approach stores the large `counties` GeoJSON data (~2MB) only once in a hidden div. Multiple maps can then reference this shared data using `shared_data_ids`, avoiding duplication and improving performance.
+This approach stores the large `counties` GeoJSON data (~2MB) only once globally in the presentation. Multiple maps across any slides can then reference this shared data, avoiding duplication.
 
 ![slide4b.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide4b.png)
 
 #### Altair
 
 ```python
-## Slide 5 : Altair plot##
 slide5 = Slide()
 slide5.add_title("Altair")
 
@@ -352,7 +358,6 @@ slide5.add_content([j], columns=[12])
 Matplotlib fig are automatically converted to svg
 
 ```python
-## Slide 5_fig : Matplotlib plot##
 slide5_fig = Slide()
 slide5_fig.add_title("Matplotlib")
 
@@ -377,12 +382,11 @@ slide5_fig.add_content([fig], columns=[12])
 
 It is **highly recommended** to set chart's width and height manually
 
-### LaTeX Support
+### LaTeX support
 
 You can use LaTeX mathematical expressions in your slides. The package automatically detects and processes LaTeX syntax:
 
 ```python
-## Slide 6 : LaTeX equations ##
 slide6 = Slide()
 slide6.add_title("Mathematical Equations")
 
@@ -398,11 +402,10 @@ slide6.add_content([math_content], columns=[12])
 
 The LaTeX processing is automatic when you include `$` or `$$` delimiters in your text content.
 
-### Bootstrap Cards
+### Bootstrap cards
 Bootstrap Cards can also be added with `add_card()` method.
 
 ```python
-## Slide 7 : Bootstrap Cards ##
 slide7 = Slide()
 
 # card 1 content
@@ -438,8 +441,6 @@ slide7.add_card(cards, styles_list)
 the Slide() method with a kwarg
 
 ```python
-
-## Slide 8 : Background ##
 bckgnd_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Frost_patterns_2.jpg/1920px-Frost_patterns_2.jpg"
 
 # Create a dictionary with slide kwargs
@@ -462,13 +463,11 @@ slide8.add_title("Image  background", **css_background)
 You can add vertical slides. First, let's create slide 9 (horizontal one) and slide 10 (vertical one)
 
 ```python
-## Slide 9 and 10 : Vertical slide ##
 slide9 = Slide()
 text = markdown("""Press arrow down to show vertical slide""")
 slide9.add_title("Horizontal and vertical slides")
 slide9.add_content([text])
 
-## Slide 10 : Vertical slide ##
 slide10 = Slide(center=True)
 slide10.add_title("Horizontal and vertical slides")
 text = markdown("""This is a vertical slide""")
@@ -479,12 +478,11 @@ They will be added as list in the next method to export your presentation
 
 ![slide8_9.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide8_9.png)
 
-### Speaker Notes
+### Speaker notes
 
 You can add speaker notes to your slides which will be visible in the speaker view:
 
 ```python
-## Slide 11 : Speaker View ##
 slide11 = Slide()
 slide11.add_title("Speaker view")
 text = markdown("""Press S for Speaker View""")
@@ -533,7 +531,7 @@ p.save_html(file_name,
             embedded=False)     # Embedded presentation mode (default: False)
 ```
 
-### Vertical Centering and Layout Options
+### Vertical centering and layout options
 
 - **`center=True`** (default): Slides are vertically centered on screen based on content
 - **`center=False`**: Slides remain at fixed height, content aligns to top - useful for presentations with lots of content
@@ -541,7 +539,7 @@ p.save_html(file_name,
 - **`embedded=False`** (default): Presentation covers full browser viewport
 
 
-### PDF Export
+### PDF export
 
 The slide can be exported with the classic  <a href="https://revealjs.com/pdf-export/" target="_blank">Reveal.js method</a>.
 

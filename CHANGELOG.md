@@ -1,19 +1,22 @@
 # Changelog
 
+## [1.1.14] - 2025-07-29
+
+### Added
+- **Global GeoJSON sharing**: Share GeoJSON data across the entire presentation
+  - Add `add_global_geojson()` method to `Presentation` class
+  - Add `add_optimized_plotly()` method to `Content` class for referencing global data
+  - Reduces HTML file size when using maps across multiple slides
+
+### Technical
+- Added global GeoJSON storage in `presentation.py`
+- Added optimized Plotly method in `content.py`
 
 ## [1.1.13] - 2025-07-29
 
 ### Added
-- **Shared Data Support for Plotly Charts**: Share large datasets across multiple charts without duplication
-  - Add `add_shared_data()` method to store data once in a hidden div
-  - Use `shared_data_id` parameter in `add_plotly()` to reference shared data
-  - Reduces HTML file size when reusing data
-
-### Technical
-- Added LaTeX processing utilities in `utils.py`
-- Improved automatic content type detection in `container.py`
-- Better MathJax 3 integration in `presentation.py`
-- New shared data architecture
+- **Add split title page**:
+  - Add `split_title_content()`
 
 ## [1.1.12] - 2025-07-25
 
@@ -53,9 +56,7 @@
 - Font Awesome icons integration
 
 ---
-
 ## Types of changes
-
 - **Added** for new features
 - **Changed** for changes in existing functionality
 - **Deprecated** for soon-to-be removed features

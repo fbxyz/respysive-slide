@@ -1,5 +1,5 @@
 from markdown import markdown
-from respysive import Presentation, Slide
+from respysive import Presentation, Slide, Content
 
 logo_url = "https://upload.wikimedia.org/wikipedia/commons/4/4d/Fractal_canopy.svg"
 
@@ -28,7 +28,7 @@ styles = [
 # Add the title page to the slide
 slide1.add_title_page(title_page_content, styles)
 
-## Slide 1b: Split Title Page Alternative ##
+## Slide 1b: split title page alternative ##
 
 # Create a slide with split title page layout
 slide1b = Slide(center=True)
@@ -114,7 +114,7 @@ très petites échelles.
 # Add image url
 url = "./assets/img/Univers_Fractal_J.H..jpg"
 
-# Add Heading to slide
+# Add heading to slide
 slide3.add_title("Bootstrap powering")
 
 # Add styles to slide
@@ -153,9 +153,7 @@ css_txt = [{'class': 'stretch'}]
 # add the scatter plot to the slide
 slide4.add_content([j], columns=[12], styles=css_txt)
 
-## Slide 4bis : Shared GeoJSON example ##
-slide_maps = Slide()
-slide_maps.add_title("Sharing GeoJSON data between multiple Plotly charts", **{'class': 'r-fit-text'})
+## Slide 4bis: shared GeoJSON example with global sharing ##
 
 # Load GeoJSON data
 from urllib.request import urlopen
@@ -174,19 +172,22 @@ random.seed(42)
 df_counties['population'] = [random.randint(10000, 500000) for _ in range(len(df_counties))]
 df_counties['income'] = [random.randint(25000, 85000) for _ in range(len(df_counties))]
 
-# Store the GeoJSON data once per slide
-slide_maps.content_obj.add_shared_data("us_counties", counties, "geojson")
+# Add global GeoJSON data to presentation (shared across all slides)
+p.add_global_geojson("us_counties", counties)
+
+slide_maps = Slide()
+slide_maps.add_title("Sharing GeoJSON data between multiple Plotly charts", **{'class': 'r-fit-text'})
 
 # Add context text
 context_text = """
-Large counties GeoJSON data (~2MB) is share only once in a hidden div.
+Large counties GeoJSON data (~2MB) is shared globally across the entire presentation
 """
 
-css_txt = [{'text-align': 'center', 'font-size': "70%"}]
+css_txt = [{'text-align': 'center', 'font-size': "60%"}]
 
 slide_maps.add_content([context_text], columns=[12], styles=css_txt)
 
-# Create first map - Random population using the shared GeoJSON 
+# Create first map - Random population using the global GeoJSON 
 population_config = {
     "data": [{
         "type": "choropleth",
@@ -202,7 +203,7 @@ population_config = {
     }
 }
 
-# Create second map - Random income using the shared GeoJSON 
+# Create second map - Random income using the global GeoJSON 
 income_config = {
     "data": [{
         "type": "choropleth",
@@ -218,13 +219,17 @@ income_config = {
     }
 }
 
-# Add the two maps side by side - first uses px.choropleth_map normally
-# The second uses shared_data_id to reference the hidden GeoJSON
-slide_maps.add_content([population_config, income_config], 
-                      columns=[6, 6], 
-                      shared_data_ids=["us_counties", "us_counties"])
+# Create content objects using global GeoJSON
+content_pop = Content()
+content_pop.add_optimized_plotly(population_config, "us_counties")
 
-## Slide 5 : Altair plot##
+content_income = Content()
+content_income.add_optimized_plotly(income_config, "us_counties")
+
+# Add the two maps side by side
+slide_maps.add_content([content_pop.render(), content_income.render()], columns=[6, 6])
+
+## Slide 5: Altair plot ##
 slide5 = Slide()
 slide5.add_title("Altair")
 
@@ -251,7 +256,7 @@ j = chart.to_json()
 # add the scatter plot to the slide
 slide5.add_content([j], columns=[12])
 
-## Slide 5_fig : Matplotlib plot##
+## Slide 5_fig: Matplotlib plot ##
 slide5_fig = Slide()
 slide5_fig.add_title("Matplotlib")
 
@@ -273,7 +278,7 @@ plt.legend(['sin(x)', 'cos(x)'])
 # add the  plot to the slide
 slide5_fig.add_content([fig], columns=[12])
 
-## Slide 6 : LaTeX equations ##
+## Slide 6: LaTeX equations ##
 slide6 = Slide()
 slide6.add_title("Mathematical Equations")
 
@@ -287,7 +292,7 @@ $$f(x) = e^{-x^2}$$
 slide6.add_content([math_content], columns=[12])
 
 
-## Slide 7 : Bootstrap Cards ##
+## Slide 7: Bootstrap cards ##
 slide7 = Slide()
 
 # card 1 content
@@ -314,7 +319,7 @@ styles_list = [{'font-size': '20px', 'color': '#1d3557', 'class': 'bg-danger'},
 slide7.add_title("Bootstrap cards can be added")
 slide7.add_card(cards, styles_list)
 
-## Slide 8 : Background ##
+## Slide 8: background ##
 
 # Create a dictionary with slide kwargs
 
@@ -330,21 +335,21 @@ slide8 = Slide(center=True, **slide_kwargs)
 css_background = {"class": "text-center", "color": "#e63946", "background-color": "#f1faee"}
 slide8.add_title("Image  background", **css_background)
 
-## Slide 9 and 10 : Vertical slide ##
+## Slide 9 and 10: vertical slide ##
 
 slide9 = Slide()
 text = markdown("""Press arrow down to show vertical slide""")
 slide9.add_title("Horizontal and vertical slides")
 slide9.add_content([text])
 
-## Slide 9 and 10 : Vertical slide ##
+## Slide 9 and 10: vertical slide ##
 
 slide10 = Slide(center=True)
 slide10.add_title("Horizontal and vertical slides")
 text = markdown("""This is a vertical slide""")
 slide10.add_content([text])
 
-## Slide 11 : Speaker View ##
+## Slide 11: speaker view ##
 
 slide11 = Slide()
 slide11.add_title("Speaker view")

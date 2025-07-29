@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import json
 
 
 def create_slide_html(slide):
@@ -26,6 +27,21 @@ class Presentation:
 
     def __init__(self):
         self.slides = []
+        self._global_geojson = {}  
+
+    def add_global_geojson(self, div_id, geojson_data):
+        """
+        Add global GeoJSON data that can be shared across all slides.
+        
+        :param div_id: Unique identifier for the GeoJSON data
+        :param geojson_data: GeoJSON data (dict or JSON string)
+        """
+        if isinstance(geojson_data, dict):
+            json_str = json.dumps(geojson_data)
+        else:
+            json_str = str(geojson_data)
+        
+        self._global_geojson[div_id] = json_str
 
     def add_slide(self, slide):
         """
@@ -86,6 +102,11 @@ class Presentation:
 
         slides_html = "\n".join([create_slide_html(slide) for slide in self.slides])
 
+       
+        global_geojson_html = ""
+        for div_id, json_str in self._global_geojson.items():
+            global_geojson_html += f'<div id="{div_id}" style="display:none;">{json_str}</div>\n'
+
         resize_script = """
             <script>
             function adjustTextSize() {
@@ -120,6 +141,7 @@ class Presentation:
               {js_links}
              </head>
              <body>
+                {global_geojson_html}
                 <div class='reveal'>
                     <div class='slides'>
                         {slides_html}

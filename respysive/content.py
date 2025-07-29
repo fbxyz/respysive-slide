@@ -388,6 +388,81 @@ class Content:
             self.content += f"""<img src="{image_src}" alt="{alt}" {s}>"""
         buffer.close()
 
+    def add_optimized_plotly(self, config, geojson_div_id, **kwargs):
+        """
+        Add a Plotly chart that references global GeoJSON data.
+        
+        :param config: Plotly configuration without geojson data
+        :param geojson_div_id: ID of the global GeoJSON div
+        :param kwargs: Additional CSS styles and html class to apply
+        """
+        import uuid
+        import json
+        
+        if 'class' not in kwargs:
+            kwargs['class'] = []
+        elif isinstance(kwargs['class'], str):
+            kwargs['class'] = [kwargs['class']]
+        kwargs['class'].append('img-fluid')
+
+        from respysive.utils import _parse_style_class
+        s = _parse_style_class(kwargs)
+
+        unique_id = f"plotly-chart-{uuid.uuid4()}"
+        config_json = json.dumps(config).replace('"', '\\"')
+
+        html_content = f"""
+        <div {s} id='{unique_id}' style='width:100%; height:400px;'></div>
+        <script type="text/javascript">
+            (function() {{
+                try {{
+                    var geojsonDiv = document.getElementById('{geojson_div_id}');
+                    if (!geojsonDiv) {{
+                        console.error('Global GeoJSON div not found: {geojson_div_id}');
+                        document.getElementById('{unique_id}').innerHTML = 
+                            '<p style="color:red;">Error: GeoJSON not found (ID: {geojson_div_id})</p>';
+                        return;
+                    }}
+                    
+                    var geojsonData = JSON.parse(geojsonDiv.textContent);
+                    var figureConfig = "{config_json}";
+                    var figure = JSON.parse(figureConfig.replace(/\\\\"/g, '"'));
+                    
+                    if (figure.data) {{
+                        figure.data.forEach(function(trace) {{
+                            if (trace.type === 'choropleth') {{
+                                trace.geojson = geojsonData;
+                            }}
+                        }});
+                    }}
+                    
+                    if (typeof Plotly !== 'undefined') {{
+                        var plotlyConfig = {{
+                            responsive: true,
+                            displayModeBar: true,
+                            displaylogo: false,
+                            modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d']
+                        }};
+                        
+                        if (!figure.layout) figure.layout = {{}};
+                        figure.layout.autosize = true;
+                        
+                        Plotly.newPlot('{unique_id}', figure.data, figure.layout, plotlyConfig);
+                    }} else {{
+                        console.error('Plotly.js is not loaded');
+                        document.getElementById('{unique_id}').innerHTML = 
+                            '<p style="color:red;">Error: Plotly.js is not loaded</p>';
+                    }}
+                }} catch(error) {{
+                    console.error('Error rendering Plotly chart:', error);
+                    document.getElementById('{unique_id}').innerHTML = 
+                        '<p style="color:red;">Error: ' + error.message + '</p>';
+                }}
+            }})();
+        </script>"""
+        
+        self.content += html_content
+
     def render(self):
         """
         Return the complete HTML document as a string.
