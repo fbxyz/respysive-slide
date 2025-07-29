@@ -200,19 +200,22 @@ class Content:
         chart_id = "plotly-chart-" + str(uuid.uuid4())
         
         if shared_data_id:
-            if shared_data_id not in self.shared_data:
-                raise ValueError(f"Shared data with ID '{shared_data_id}' not found. Use add_shared_data() first.")
+            # Try to find shared data locally first, then look for global data
+            use_local_data = shared_data_id in self.shared_data
             
             plotly_data_json = json.dumps(plotly_data) if plotly_data else 'null'
+            
+            # Use appropriate element ID based on data source
+            data_element_id = f'shared-data-{shared_data_id}' if use_local_data else shared_data_id
             
             html_content = f"""
         <div {s} id='{chart_id}' style='width:100%; height:400px;'></div>
         <script type="text/javascript">
             (function() {{
                 try {{
-                    var sharedDataElement = document.getElementById('shared-data-{shared_data_id}');
+                    var sharedDataElement = document.getElementById('{data_element_id}');
                     if (!sharedDataElement) {{
-                        throw new Error('Shared data element not found');
+                        throw new Error('Shared data element not found with ID: {data_element_id}');
                     }}
                     var sharedData = JSON.parse(sharedDataElement.textContent);
                     

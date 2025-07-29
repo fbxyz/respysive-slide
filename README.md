@@ -238,10 +238,21 @@ slide4.add_content([j], columns=[12], styles=css_txt)
 
 #### Sharing GeoJSON data between multiple Plotly charts
 
-You can optimize performance by sharing large data (like GeoJSON) between multiple charts across the entire presentation:
+You can optimize performance by sharing large data (like GeoJSON) between multiple charts across the entire presentation.
 
+**Simple example:**
 ```python
-from respysive import Presentation, Slide, Content
+# Add shared data once
+p.add_global_geojson("my_data", geojson_dict)
+# Use in multiple charts with shared_data_ids parameter  
+slide.add_content([chart1, chart2],
+                  columns=[6, 6],
+                  shared_data_ids=["my_data", "my_data"])
+```
+
+**Complete example:**
+```python
+from respysive import Presentation, Slide
 
 # Create presentation
 p = Presentation()
@@ -261,66 +272,151 @@ import random
 random.seed(42)
 df_counties['population'] = [random.randint(10000, 500000) for _ in range(len(df_counties))]
 df_counties['income'] = [random.randint(25000, 85000) for _ in range(len(df_counties))]
+# Add area data for density calculation
+df_counties['area_sq_miles'] = [random.randint(200, 2000) for _ in range(len(df_counties))]
+df_counties['density'] = (df_counties['population'] / df_counties['area_sq_miles']).round(1)
 
-# Add global GeoJSON data to presentation (shared across all slides)
+# Add global geojson data to presentation
 p.add_global_geojson("us_counties", counties)
 
 slide_maps = Slide()
-slide_maps.add_title("Sharing GeoJSON data between multiple Plotly charts", **{'class': 'r-fit-text'})
+slide_maps.add_title("Sharing geojson data between multiple plotly charts", **{'class': 'r-fit-text'})
 
 # Add context text
 context_text = """
-Large counties GeoJSON data (~2MB) is shared globally across the entire presentation
+Counties geojson data (~2MB) is shared across the presentation
 """
 
 css_txt = [{'text-align': 'center', 'font-size': "70%"}]
 
 slide_maps.add_content([context_text], columns=[12], styles=css_txt)
 
-# Create first map - Random population using the global GeoJSON 
+# Create population density map
 population_config = {
     "data": [{
         "type": "choropleth",
         "locations": df_counties['fips'].tolist(),
-        "z": df_counties['population'].tolist(),
+        "z": df_counties['density'].tolist(),
         "colorscale": "Blues",
-        "colorbar": {"title": "Population"}
+        "colorbar": {
+            "title": "Density<br>(per sq mi)",
+            "thickness": 15,
+            "len": 0.7
+        },
+        "hovertemplate": (
+            "<b>County {text}</b><br>" +
+            "Population: %{customdata[0]:,.0f}<br>" +
+            "Area: %{customdata[1]:,.0f} sq mi<br>" + 
+            "Density: <b>%{z:.1f} per sq mi</b>" +
+            "<extra></extra>"
+        ),
+        "text": df_counties['fips'].tolist(),
+        "customdata": list(zip(df_counties['population'], df_counties['area_sq_miles']))
     }],
     "layout": {
-        "geo": {"projection": {"type": "albers usa"}, "scope": "usa"},
-        "title": "Population by County",
-        "margin": {"r":0,"t":40,"l":0,"b":0}
+        "geo": {
+            "projection": {"type": "albers usa"}, 
+            "scope": "usa",
+            "showlakes": True,
+            "lakecolor": "lightblue"
+        },
+        "title": {
+            "text": "Population Density by County (Random Data)",
+            "x": 0.5,
+            "xanchor": "center",
+            "font": {"size": 16}
+        },
+        "margin": {"r":10,"t":50,"l":10,"b":10}
     }
 }
 
-# Create second map - Random income using the global GeoJSON 
+# Create choropleth map for income
 income_config = {
     "data": [{
-        "type": "choropleth",
+        "type": "choroplethmap",
         "locations": df_counties['fips'].tolist(),
         "z": df_counties['income'].tolist(),
-        "colorscale": "reds",
-        "colorbar": {"title": "Income"}
+        "colorscale": [
+            [0.0, "#ffffb2"],
+            [0.2, "#fed976"],
+            [0.4, "#feb24c"],
+            [0.6, "#fd8d3c"],
+            [0.8, "#f03b20"],
+            [1.0, "#bd0026"]
+        ],
+        "colorbar": {
+            "title": {
+                "text": "Median Income ($)",
+                "font": {"size": 14, "family": "Arial Black"}
+            },
+            "thickness": 20,
+            "len": 0.8,
+            "x": 1.02,
+            "tickmode": "array",
+            "tickvals": [25000, 40000, 55000, 70000, 85000],
+            "ticktext": ["$25K", "$40K", "$55K", "$70K", "$85K"],
+            "tickfont": {"size": 11}
+        },
+        "hovertemplate": (
+            "<b>County FIPS: %{location}</b><br>" +
+            "Median Income: <b>$%{z:,.0f}</b><br>" +
+            "Population: <b>%{customdata:,.0f}</b>" +
+            "<extra></extra>"
+        ),
+        "customdata": df_counties['population'].tolist(),
+        "marker": {
+            "line": {"color": "white", "width": 0.5},
+            "opacity": 0.9
+        }
     }],
     "layout": {
-        "geo": {"projection": {"type": "albers usa"}, "scope": "usa"},
-        "title": "Income by County",
-        "margin": {"r":0,"t":40,"l":0,"b":0}
+        "map": {
+            "style": "carto-positron",
+            "zoom": 3.2,
+            "center": {"lat": 38.0, "lon": -97.0}
+        },
+        "title": {
+            "text": "Median Household Income by County (Random Data)",
+            "x": 0.5,
+            "xanchor": "center",
+            "font": {
+                "size": 18,
+                "family": "Arial Black", 
+                "color": "#2E86AB"
+            },
+            "pad": {"t": 20}
+        },
+        "annotations": [{
+            "text": "Data source: Simulated random data",
+            "showarrow": False,
+            "x": 0.99,
+            "y": 0.01,
+            "xref": "paper",
+            "yref": "paper",
+            "xanchor": "right",
+            "yanchor": "bottom",
+            "font": {"size": 10, "color": "gray"}
+        }],
+        "margin": {"r":80,"t":80,"l":20,"b":40},
+        "paper_bgcolor": "rgba(248, 249, 250, 0.95)"
     }
 }
 
-# Create content objects using global GeoJSON
-content_pop = Content()
-content_pop.add_optimized_plotly(population_config, "us_counties")
-
-content_income = Content()
-content_income.add_optimized_plotly(income_config, "us_counties")
-
-# Add the two maps side by side
-slide_maps.add_content([content_pop.render(), content_income.render()], columns=[6, 6])
+# Add the two maps side by side using shared GeoJSON data
+slide_maps.add_content(
+    [population_config, income_config], 
+    columns=[6, 6],
+    shared_data_ids=["us_counties", "us_counties"]
+)
 ```
 
 This approach stores the large `counties` GeoJSON data (~2MB) only once globally in the presentation. Multiple maps across any slides can then reference this shared data, avoiding duplication.
+
+**Compatible map types:**
+- `choropleth` - Standard geographic choropleth maps
+- `choroplethmap` - Modern tile-based choropleth maps  
+- `scattermap`/`scattermapbox` - Scatter plots on maps
+- Line plots on maps (using `scattermap` with `mode: "lines"`)
 
 ![slide4b.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide4b.png)
 

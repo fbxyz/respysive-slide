@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.15] - 2025-07-29
+
+### Added
+- **Simplified GeoJSON sharing API**: Use `shared_data_ids` parameter directly in `add_content()`
+- **Map types support**: Added support for plotly maps (choroplethmap, scattermap, lines)
+
+### Changed  
+- **API improvement**: Direct `shared_data_ids` parameter instead of manual `Content()` objects
+
+### Fixed
+- **MathJax compatibility**: Fixed SVG output conflicts with Plotly charts
+- **GeoJSON data access**: Improved global data handling between Presentation and Content classes
+
 ## [1.1.14] - 2025-07-29
 
 ### Added
