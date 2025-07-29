@@ -46,11 +46,27 @@ section.has-light-background, section.has-light-background h1, section.has-light
   --r-link-color-hover: #005bd2;
   --r-selection-background-color: #009ee3;
   --r-selection-color: #fff;
+  
+}
+
+/* Arrière-plan noir pour isoler la présentation */
+body {
+  background: #000000 !important;
+  background-color: #000000 !important;
 }
 
 .reveal-viewport {
+  background: #000000;
+  background-color: #000000;
+}
+
+/* Zone de présentation centrale avec fond blanc pour isoler les slides */
+.reveal {
   background: #FFFFFF;
   background-color: var(--r-background-color);
+  max-width: 85%;
+  margin: 0 auto;
+  box-shadow: 0 0 50px rgba(255, 255, 255, 0.1);
 }
 
 .reveal {
@@ -346,24 +362,219 @@ section.has-light-background, section.has-light-background h1, section.has-light
  * NAVIGATION CONTROLS
  *********************************************/
 .reveal .controls {
-  color: var(--r-link-color);
+  color: #e30015;
+  z-index: 200;
 }
 
+.reveal .controls .controls-arrow {
+  color: #e30015;
+}
+
+.reveal .controls .controls-arrow:hover {
+  color: #e30015;
+  opacity: 0.8;
+}
+
+.reveal .controls .controls-arrow:before {
+  border-color: #e30015;
+}
+
+
 /*********************************************
- * PROGRESS BAR
+ * VAGUE ROUGE EFS POUR PAGE TITRE
  *********************************************/
-.reveal .progress {
-  background: rgba(0, 0, 0, 0.2);
-  color: var(--r-link-color);
+/* Classe optionnelle pour vague rouge sur page titre */
+.title-page.with-red-wave {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Forcer la hauteur du container parent quand on a une grande section */
+section[style*="min-height"] .container {
+  min-height: inherit; /* Hérite de la hauteur de la section */
+}
+
+/* Vague traversant toute la diapositive */
+.title-page.with-red-wave::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 120px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 110.83146'%3E%3Cpath d='m 0,44.587482 c 1.9032,0.05277 23.27436,2.097082 31.61744,1.406739 38.205535,-3.161297 44.742366,-13.603723 82.983507,-13.615151 24.471868,-0.0073 50.802944,15.889528 88.632267,42.028586 31.556931,21.805003 57.090466,29.702924 71.810436,29.933764 29.45226,0.46186 61.50946,-19.9592 63.61444,-19.944166 L 400,30 L 500,35 L 600,25 L 700,40 L 800,20 L 900,45 L 1000,30' stroke='%23e30015' stroke-width='1.32292' fill='none' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+  pointer-events: none;
 }
 
 /*********************************************
- * PRINT BACKGROUND
+ * PRINT BACKGROUND & PDF EXPORT
  *********************************************/
 @media print {
   .backgrounds {
     background-color: var(--r-background-color);
   }
+  
+  /* Fond blanc pour l'export PDF */
+  body {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+  }
+  
+  .reveal-viewport {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+  }
+  
+  /* Corriger le positionnement en print */
+  .reveal {
+    max-width: 100% !important;
+    margin: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    position: relative !important;
+  }
+  
+  /* Vague rouge adaptée pour l'impression */
+  .title-page.with-red-wave::before {
+    opacity: 0.3;
+    width: 300px;
+    height: 80px;
+  }
+  
+  /* Corriger les marges négatives en impression */
+  .title-page h2, .title-page h3, .title-page h4 {
+    margin-left: 0 !important;
+  }
+  
+  /* Footer plus discret en impression */
+  .line.bottom {
+    height: 20px;
+    bottom: 20px;
+  }
+  
+  /* Supprimer toutes les bordures EFS en print */
+  .line {
+    display: none !important;
+  }
+}
+
+/* Règles spécifiques pour print-pdf (Reveal.js PDF export) */
+.reveal.print-pdf .title-page.with-red-wave::before {
+  opacity: 0.4;
+  width: 300px;
+  height: 80px;
+}
+
+/* Fond blanc pour le mode print-pdf de Reveal.js */
+.reveal.print-pdf body,
+body.print-pdf {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+}
+
+.reveal.print-pdf .reveal-viewport,
+.print-pdf .reveal-viewport {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+}
+
+/* Corriger le centrage et les marges en mode print-pdf */
+.reveal.print-pdf {
+  max-width: 100% !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  left: 0 !important;
+  right: 0 !important;
+  position: relative !important;
+}
+
+.reveal.print-pdf .slides {
+  margin: 0 !important;
+  padding: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.reveal.print-pdf .slides section {
+  margin: 0 !important;
+  padding: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+}
+
+/* Forcer left: 0 pour toutes les sections en print-pdf avec spécificité maximale */
+.reveal.print-pdf .slides section[style*="left"][style*="top"][style*="width"] {
+  left: 0 !important;
+  margin-left: 0 !important;
+  transform: translateX(0) !important;
+  position: relative !important;
+}
+
+.reveal.print-pdf .slides section.center {
+  left: 0 !important;
+  margin-left: 0 !important;
+  transform: translateX(0) !important;
+  position: relative !important;
+}
+
+.reveal.print-pdf .slides section {
+  left: 0 !important;
+  margin-left: 0 !important;
+  transform: translateX(0) !important;
+}
+
+.reveal.print-pdf .slides section .container {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+  left: 0 !important;
+  transform: none !important;
+}
+
+/* Forcer l'alignement à gauche pour tous les éléments Bootstrap en print-pdf */
+.reveal.print-pdf .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.reveal.print-pdf .col,
+.reveal.print-pdf [class*="col-"] {
+  padding-left: 0 !important;
+  padding-right: 15px !important;
+}
+
+/* Forcer la suppression des bordures EFS en print-pdf */
+.reveal.print-pdf .line,
+.print-pdf .line {
+  display: none !important;
+}
+
+
+/* Masquer seulement les contrôles en print-pdf */
+.reveal.print-pdf .controls,
+.print-pdf .controls {
+  display: none !important;
+}
+
+/* Corriger le débordement de texte en PDF export */
+.reveal.print-pdf .title-page h2,
+.reveal.print-pdf .title-page h3, 
+.reveal.print-pdf .title-page h4 {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Désactiver les bordures en mode PDF */
+.reveal.print-pdf .line {
+  display: none;
 }
 
 /* Structure ABM avec couleurs EFS */
@@ -387,13 +598,14 @@ section.has-light-background, section.has-light-background h1, section.has-light
 .line.bottom {
   left: 0;
   top: auto;
-  bottom: 0;
+  bottom: 60px; /* Plus haut */
   width: 100%;
-  height: 30px;
+  height: 40px; /* Un peu plus épais */
 }
 @media (max-width: 840px) {
   .line.bottom {
-    height: 15px;
+    height: 20px;
+    bottom: 30px;
   }
 }
 .line.left {
@@ -420,11 +632,32 @@ section.has-light-background, section.has-light-background h1, section.has-light
   }
 }
 
+/*********************************************
+ * FOOTER BLEU EFS VIA SLIDE BACKGROUND
+ *********************************************/
+.slide-background-content::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 80px;
+  background: #002f6c;
+  z-index: 1;
+}
+
+/*********************************************
+ * BARRE DE PROGRESSION
+ *********************************************/
 .reveal .progress {
-  z-index: 1000;
-  color: #002f6c;
-  height: 5px;
-  bottom: 30px;
+  background: rgba(0, 0, 0, 0.2);
+  color: #e30015;
+  z-index: 100;
+}
+
+.reveal .progress span {
+  background: #e30015;
 }
 
 .reveal:before {

@@ -6,8 +6,14 @@ def create_slide_html(slide):
         return "<section>" + "\n".join([create_slide_html(subslide) for subslide in slide]) + "</section>"
 
     kwargs_str = ' '.join([f'{k}="{v}"' for k, v in slide.kwargs.items()])
+    
+    shared_data_html = ""
+    if hasattr(slide, 'content_obj') and slide.content_obj.content:
+        shared_data_html = slide.content_obj.content
+    
     return f"""<section {kwargs_str} class='{'center' if slide.center else ''}'>
         <div class='container' style='text-align: left;' >
+            {shared_data_html}
             {slide.content}
         </div>
     </section>"""
@@ -33,7 +39,7 @@ class Presentation:
         else:
             self.slides.append(slide)
 
-    def to_html(self, theme="moon", width=960, height=600, minscale=0.2, maxscale=1.5, margin=0.1, custom_theme=None):
+    def to_html(self, theme="moon", width=960, height=600, minscale=0.2, maxscale=1.5, margin=0.1, custom_theme=None, center=True, embedded=False):
         """
         Return the presentation as an HTML string.
 
@@ -44,6 +50,8 @@ class Presentation:
         :param maxscale: float, the maximum scale of the presentation (default: 1.5)
         :param margin: float, the margin of the presentation (default: 0.1)
         :param custom_theme: str, a link to a custom theme CSS file, required if theme is set to 'custom'
+        :param center: bool, vertical centering of slides (default: True)
+        :param embedded: bool, whether the presentation is embedded in a smaller container (default: False)
         :return: str, the presentation in HTML format
         :raises ValueError: if the theme is set to 'custom' but no custom_theme link is provided
         """
@@ -133,7 +141,6 @@ class Presentation:
 
                 function(Reveal, RevealNotes){{
                     Reveal.initialize({{
-                        center: false,
                         pdfMaxPagesPerSlide: 1,
                         pdfSeparateFragments: false,
                         display:'block',
@@ -145,7 +152,8 @@ class Presentation:
                         plugins: [RevealNotes],
                         width: {width},
                         height: {height},
-                        center: true,
+                        center: {str(center).lower()},
+                        embedded: {str(embedded).lower()},
                         margin: {margin},
                         minScale: {minscale},
                         maxScale: {maxscale},
@@ -173,7 +181,7 @@ class Presentation:
         return presentation_html
 
     def save_html(self, file_name, theme="moon", width=960, height=600, minscale=0.2, maxscale=1.5, margin=0.1,
-                  custom_theme=None):
+                  custom_theme=None, center=True, embedded=False):
         """
         Saves the presentation as an HTML file.
 
@@ -185,6 +193,8 @@ class Presentation:
         :param maxscale: The maximum scale of the presentation. Default is 1.5.
         :param margin: The margin around the presentation. Default is 0.1.
         :param custom_theme: The URL of a custom theme CSS file.
+        :param center: Vertical centering of slides. Default is True.
+        :param embedded: Whether the presentation is embedded in a smaller container. Default is False.
         :raises ValueError: If the theme is set to "custom" and no URL is provided for the custom theme.
         """
         if theme == "custom" and custom_theme is None:
@@ -196,8 +206,8 @@ class Presentation:
             theme_link = theme
 
         presentation_html = self.to_html(theme=theme_link, width=width, height=height, minscale=minscale,
-                                         maxscale=maxscale,
-                                         margin=margin, custom_theme=custom_theme)
+                                         maxscale=maxscale, margin=margin, custom_theme=custom_theme,
+                                         center=center, embedded=embedded)
 
-        with open(file_name, "w") as f:
+        with open(file_name, "w", encoding='utf-8') as f:
             f.write(presentation_html)

@@ -16,6 +16,11 @@ With PyPI
 pip install respysive-slide
 ```
 
+Upgrade
+```
+pip install respysive-slide --upgrade
+```
+
 You can also clone the <a href="https://github.com/fbxyz/respysive-slide" target="_blank">repo</a> and import respysive as a module
 
 ___
@@ -69,6 +74,61 @@ the add_title method takes a dictionary kwarg `styles` containing :
 
 ![slide1.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide1.png)
 
+### Split Title Page Layout
+
+As an alternative to the classic title page, you can create a split layout with the title content on one side and custom content (logo, image, chart) on the other side using `add_split_title_page()`:
+
+```python
+# Create a slide with split title page layout
+slide1b = Slide(center=True)
+
+# Content for the split title page
+split_title_content = {
+    'title': 'Your presentation title',
+    'subtitle': 'Your subtitle',
+    'authors': 'Author 1, Author 2',
+}
+
+# Styles for the title elements  
+title_styles = [
+    {'color': '#e63946', 'font-weight': 'bold', 'font-size': '60px'},  # title
+    {'color': '#457b9d', 'font-size': '40px'},  # subtitle
+    {'color': '#457b9d', 'font-size': '25px'},  # authors
+]
+
+# Style for the title column 
+title_column_style = {
+    'background-color': '#1d3557', 
+    'color': '#f1faee',             
+    'padding': '40px',              
+    'border-radius': '10px 0 0 10px'  
+}
+
+# Style for the custom content column 
+image_style = {
+    'text-align': 'center',
+    'padding': '30px',
+    'background-color': '#e63946',
+    'border-radius': '0 10px 10px 0'  
+}
+
+# Add the split title page - title on left (8 cols), logo on right (4 cols)
+slide1b.add_split_title_page(
+    title_page_content=split_title_content,
+    custom_content=logo_url,
+    title_column_width=8,
+    custom_column_width=4,
+    title_page_class="split-intro",
+    custom_content_style=image_style,
+    title_styles=title_styles,
+    title_column_style=title_column_style  
+)
+```
+
+![split_title.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/split_title.png)
+
+
+
 ### A simple text slide
 
 Now, lets create a simple slide with a title and some content. 
@@ -115,22 +175,22 @@ En cosmologie, le modèle de l'univers fractal désigne un modèle cosmologique
 dont la structure et la répartition de la matière possèdent une dimension fractale, 
 et ce, à plusieurs niveaux. 
 
-De façon plus générale, il correspond à l'usage ou l'apparence de fractales 
-dans l'étude de l'Univers et de la matière qui le compose.
+De façon plus générale, il correspond à l'usage ou 
+l'apparence de fractales dans l'étude de l'Univers et de la matière qui le compose.
 Ce modèle présente certaines lacunes lorsqu'il est utilisé à de très grandes ou de 
 très petites échelles.
 
 """)
 
 # Add image url
-url = "https://upload.wikimedia.org/wikipedia/commons/d/d5/Univers_Fractal_J.H..jpg"
+url = "./assets/img/Univers_Fractal_J.H..jpg"
 
 # Add title to slide
 slide3.add_title("Bootstrap powering")
 
 # Add styles to slide
 css_txt = [
-    {'font-size': '70%', 'text-align': 'justify', 'class': 'bg-warning fragment'},  # text style
+    {'font-size': '70%', 'text-align': 'justify', 'class': 'bg-warning'},  # text style
     None  # url style is mandatory even it is None
 ]
 
@@ -139,7 +199,7 @@ css_txt = [
 slide3.add_content([text, url], columns=[7, 5], styles=css_txt)
 ```
 
-`class : 'fragment'` is used to pass <a href="https://revealjs.com/fragments/" target="_blank">Reveal.js fragments</a>
+Note that class can include <a href="https://revealjs.com/fragments/" target="_blank">Reveal.js fragments</a> for step-by-step content reveal.
 
 ![slide3.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide3.png)
 
@@ -174,8 +234,90 @@ css_txt = [{'class': 'stretch'}]
 # add the scatter plot to the slide
 slide4.add_content([j], columns=[12], styles=css_txt)
 
-```
+```  
 ![slide4.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide4.png)
+
+#### Sharing GeoJSON data between multiple Plotly charts
+
+You can optimize performance by sharing large data (like GeoJSON) between multiple charts by storing it once in a hidden div:
+
+```python
+## Slide with shared GeoJSON ##
+slide_maps = Slide()
+slide_maps.add_title("Sharing GeoJSON data between multiple Plotly charts", **{'class': 'r-fit-text'})
+
+# Load GeoJSON data
+from urllib.request import urlopen
+import json
+with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
+    counties = json.load(response)
+
+# Load unemployment data
+import pandas as pd
+df_counties = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/fips-unemp-16.csv",
+                   dtype={"fips": str})
+
+# Add additional columns with pandas
+import random
+random.seed(42)
+df_counties['population'] = [random.randint(10000, 500000) for _ in range(len(df_counties))]
+df_counties['income'] = [random.randint(25000, 85000) for _ in range(len(df_counties))]
+
+# Store the GeoJSON data once per slide
+slide_maps.content_obj.add_shared_data("us_counties", counties, "geojson")
+
+# Add context text
+context_text = """
+Large counties GeoJSON data (~2MB) is shared only once in a hidden div.
+"""
+
+css_txt = [{'text-align': 'center', 'font-size': "70%"}]
+
+slide_maps.add_content([context_text], columns=[12], styles=css_txt)
+
+# Create first map - Random population using the shared GeoJSON 
+population_config = {
+    "data": [{
+        "type": "choropleth",
+        "locations": df_counties['fips'].tolist(),
+        "z": df_counties['population'].tolist(),
+        "colorscale": "Blues",
+        "colorbar": {"title": "Population"}
+    }],
+    "layout": {
+        "geo": {"projection": {"type": "albers usa"}, "scope": "usa"},
+        "title": "Population by County",
+        "margin": {"r":0,"t":40,"l":0,"b":0}
+    }
+}
+
+# Create second map - Random income using the shared GeoJSON 
+income_config = {
+    "data": [{
+        "type": "choropleth",
+        "locations": df_counties['fips'].tolist(),
+        "z": df_counties['income'].tolist(),
+        "colorscale": "reds",
+        "colorbar": {"title": "Income"}
+    }],
+    "layout": {
+        "geo": {"projection": {"type": "albers usa"}, "scope": "usa"},
+        "title": "Income by County",
+        "margin": {"r":0,"t":40,"l":0,"b":0}
+    }
+}
+
+# Add the two maps side by side using shared_data_ids to reference the hidden GeoJSON
+slide_maps.add_content([population_config, income_config], 
+                      columns=[6, 6], 
+                      shared_data_ids=["us_counties", "us_counties"])
+```
+
+This approach stores the large `counties` GeoJSON data (~2MB) only once in a hidden div. Multiple maps can then reference this shared data using `shared_data_ids`, avoiding duplication and improving performance.
+
+![slide4b.png.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide4b.png.png)
+
+#### Altair
 
 ```python
 ## Slide 5 : Altair plot##
@@ -227,7 +369,6 @@ plt.plot(x,y,x,z)
 plt.xlabel('x values')
 plt.title('sin and cos ')
 plt.legend(['sin(x)', 'cos(x)'])
-plt.show()
 
 # add the  plot to the slide
 slide5_fig.add_content([fig], columns=[12])
@@ -254,10 +395,8 @@ $$f(x) = e^{-x^2}$$
 
 slide6.add_content([math_content], columns=[12])
 ```
-![slide_latex.png](assets/img/slide_latex.png)
 
 The LaTeX processing is automatic when you include `$` or `$$` delimiters in your text content.
-
 
 ### Bootstrap Cards
 Bootstrap Cards can also be added with `add_card()` method.
@@ -312,7 +451,7 @@ slide_kwargs = {
 # Create a slide object with slide kwargs
 slide8 = Slide(center=True, **slide_kwargs)
 
-css_background = {"class": "text-center", "color": "#e63946", "background-color":"#f1faee"}
+css_background = {"class": "text-center", "color": "#e63946", "background-color": "#f1faee"}
 slide8.add_title("Image  background", **css_background)
 ```
 
@@ -329,7 +468,7 @@ text = markdown("""Press arrow down to show vertical slide""")
 slide9.add_title("Horizontal and vertical slides")
 slide9.add_content([text])
 
-## Slide 9 and 10 : Vertical slide ##
+## Slide 10 : Vertical slide ##
 slide10 = Slide(center=True)
 slide10.add_title("Horizontal and vertical slides")
 text = markdown("""This is a vertical slide""")
@@ -340,6 +479,29 @@ They will be added as list in the next method to export your presentation
 
 ![slide8_9.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide8_9.png)
 
+### Speaker Notes
+
+You can add speaker notes to your slides which will be visible in the speaker view:
+
+```python
+## Slide 11 : Speaker View ##
+slide11 = Slide()
+slide11.add_title("Speaker view")
+text = markdown("""Press S for Speaker View""")
+
+# Add speaker notes
+speaker_notes = markdown("""
+  <aside class="notes">
+    This is a test for speaker view
+  </aside>
+""")
+
+slide11.add_content([text])
+slide11.add_content([speaker_notes])
+```
+
+Press 'S' during the presentation to open the speaker view with your notes.
+
 ### Presentation rendering
 Last step in rendering your Reveal.js presentation with `respysive-slide` as  HTML
 The `Presentation.add_slide()` method is used
@@ -347,7 +509,7 @@ The `Presentation.add_slide()` method is used
 ```python
 
 # Adding slide to the presentation
-p.add_slide([slide1, slide2, slide3, slide4, slide5, slide5_fig, slide6, slide7, slide8, [slide9, slide10]])
+p.add_slide([slide1, slide1b, slide2, slide3, slide4, slide_maps, slide5, slide5_fig, slide6, slide7, slide8, [slide9, slide10], slide11])
 
 # Saving the presentation in HTML format
 p.save_html("readme_example.html")
@@ -366,10 +528,17 @@ p.save_html(file_name,
             minscale=0.2,
             maxscale=1.5,
             margin=0.1,
-            custom_theme=None)  # If theme="custom", pass here the custom css url 
+            custom_theme=None,  # If theme="custom", pass here the custom css url 
+            center=True,        # Vertical centering of slides (default: True)
+            embedded=False)     # Embedded presentation mode (default: False)
 ```
 
-Note that you need an internet connection to show your Slides !
+### Vertical Centering and Layout Options
+
+- **`center=True`** (default): Slides are vertically centered on screen based on content
+- **`center=False`**: Slides remain at fixed height, content aligns to top - useful for presentations with lots of content
+- **`embedded=True`**: Presentation adapts to its container size - useful for embedding in web pages
+- **`embedded=False`** (default): Presentation covers full browser viewport
 
 
 ### PDF Export
@@ -384,7 +553,4 @@ Best results are obtained with Chrome or Chromium
 ## Future features
 - add method for speaker view
 - offline presentation
-- better recognition of json plotly
 - prettify the final rendering
-
-

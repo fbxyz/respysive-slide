@@ -18,9 +18,11 @@ class Content:
         self.content = ""
         self.scripts = {}
         self.grid_cols = 0
+        self.shared_data = {}
 
     def clear(self):
         self.content = ""
+        self.shared_data = {}
 
     def add_script(self, name: str, script: str):
         """
@@ -29,6 +31,30 @@ class Content:
         :param script : script to add
         """
         self.scripts[name] = script
+
+    def add_shared_data(self, data_id: str, data, data_type: str = "json"):
+        """
+        Store shared data (JSON/GeoJSON) that can be referenced by multiple charts
+        :param data_id: Unique identifier for the data
+        :param data: The data to store (dict, str, or object with to_json method)
+        :param data_type: Type of data ('json', 'geojson')
+        """
+        if hasattr(data, 'to_json'):
+            json_str = data.to_json()
+        elif isinstance(data, dict):
+            json_str = json.dumps(data)
+        elif isinstance(data, str):
+            json_str = data
+        else:
+            raise ValueError("data must be an object with to_json method, a dictionary, or a JSON string")
+        
+        self.shared_data[data_id] = {
+            'data': json_str,
+            'type': data_type
+        }
+        
+        # Add hidden div with the data
+        self.content += f'<div id="shared-data-{data_id}" style="display:none;" data-type="{data_type}">{json_str}</div>'
 
     def add_heading(self, text: str, tag: str = "h3", icon: str = None, **kwargs):
         """
@@ -108,6 +134,9 @@ class Content:
         elif isinstance(kwargs['class'], str):
             kwargs['class'] = [kwargs['class']]
         kwargs['class'].append('img-fluid')
+        
+        if src.lower().endswith('.svg') and 'max_width' not in kwargs:
+            kwargs['max_width'] = '100%'
 
         if src.startswith(('http://', 'https://')):
             response = requests.get(src)
@@ -119,8 +148,19 @@ class Content:
             with open(src, "rb") as f:
                 image_data = f.read()
 
+        if src.lower().endswith('.svg'):
+            mime_type = "image/svg+xml"
+        elif src.lower().endswith(('.jpg', '.jpeg')):
+            mime_type = "image/jpeg"
+        elif src.lower().endswith('.png'):
+            mime_type = "image/png"
+        elif src.lower().endswith('.gif'):
+            mime_type = "image/gif"
+        else:
+            mime_type = "image/png"
+            
         image_base64 = base64.b64encode(image_data).decode("utf-8")
-        image_src = f"data:image/png;base64,{image_base64}"
+        image_src = f"data:{mime_type};base64,{image_base64}"
 
         s = _parse_style_class(kwargs)
         self.content += f"""<img src="{image_src}" alt="{alt}" {s}>"""
@@ -147,7 +187,7 @@ class Content:
 
         self.content += f"""<div {s}>{svg}</div>"""
 
-    def add_plotly(self, plotly_data, **kwargs):
+    def add_plotly(self, plotly_data, shared_data_id=None, **kwargs):
 
         if 'class' not in kwargs:
             kwargs['class'] = []
@@ -157,26 +197,89 @@ class Content:
 
         s = _parse_style_class(kwargs)
 
-        # Conversion en JSON string si nécessaire
-        if hasattr(plotly_data, 'to_json'):
-            # Objet Figure Plotly
-            json_str = plotly_data.to_json()
-        elif isinstance(plotly_data, dict):
-            # Dictionnaire Python
-            json_str = json.dumps(plotly_data)
-        elif isinstance(plotly_data, str):
-            # Déjà une string JSON
-            json_str = plotly_data
-        else:
-            raise ValueError("plotly_data doit être un objet Figure, un dictionnaire ou une string JSON")
-
-
-        json_escaped = json_str.replace("'", "\u2019").replace('"', '\\"')
-
-        import uuid
         chart_id = "plotly-chart-" + str(uuid.uuid4())
+        
+        if shared_data_id:
+            if shared_data_id not in self.shared_data:
+                raise ValueError(f"Shared data with ID '{shared_data_id}' not found. Use add_shared_data() first.")
+            
+            plotly_data_json = json.dumps(plotly_data) if plotly_data else 'null'
+            
+            html_content = f"""
+        <div {s} id='{chart_id}' style='width:100%; height:400px;'></div>
+        <script type="text/javascript">
+            (function() {{
+                try {{
+                    var sharedDataElement = document.getElementById('shared-data-{shared_data_id}');
+                    if (!sharedDataElement) {{
+                        throw new Error('Shared data element not found');
+                    }}
+                    var sharedData = JSON.parse(sharedDataElement.textContent);
+                    
+                    // Merge shared data with plotly_data if provided
+                    var figure = {{}};
+                    var plotlyConfig = {plotly_data_json};
+                    if (plotlyConfig && typeof plotlyConfig === 'object') {{
+                        figure = plotlyConfig;
+                        // Si les données partagées contiennent des features GeoJSON, les ajouter
+                        if (sharedData.features && figure.data && figure.data.length > 0) {{
+                            figure.data[0].geojson = sharedData;
+                        }}
+                    }} else {{
+                        // Utiliser uniquement les données partagées
+                        figure = {{
+                            data: [{{
+                                type: 'choropleth',
+                                geojson: sharedData,
+                                locations: [],
+                                z: []
+                            }}],
+                            layout: {{
+                                geo: {{projection: {{type: "natural earth"}}, scope: "world"}},
+                                margin: {{"r":0,"t":0,"l":0,"b":0}}
+                            }}
+                        }};
+                    }}
 
-        html_content = f"""
+                    if (typeof Plotly !== 'undefined') {{
+                        var config = {{
+                            responsive: true,
+                            displayModeBar: true,
+                            displaylogo: false,
+                            modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d']
+                        }};
+
+                        if (!figure.layout) {{
+                            figure.layout = {{}};
+                        }}
+
+                        figure.layout.autosize = true;
+
+                        Plotly.newPlot('{chart_id}', figure.data, figure.layout, config);
+                    }} else {{
+                        document.getElementById('{chart_id}').innerHTML = 
+                            '<p style="color:red;">Erreur: Plotly.js n\\'est pas chargé</p>';
+                    }}
+                }} catch(error) {{
+                    console.error('Erreur lors du rendu du graphique Plotly:', error);
+                    document.getElementById('{chart_id}').innerHTML = 
+                        '<p style="color:red;">Erreur lors du rendu du graphique</p>';
+                }}
+            }})();
+        </script>"""
+        else:
+            if hasattr(plotly_data, 'to_json'):
+                json_str = plotly_data.to_json()
+            elif isinstance(plotly_data, dict):
+                json_str = json.dumps(plotly_data)
+            elif isinstance(plotly_data, str):
+                json_str = plotly_data
+            else:
+                raise ValueError("plotly_data doit être un objet Figure, un dictionnaire ou une string JSON")
+
+            json_escaped = json_str.replace("'", "\u2019").replace('"', '\\"')
+
+            html_content = f"""
         <div {s} id='{chart_id}' style='width:100%; height:400px;'></div>
         <script type="text/javascript">
             (function() {{
@@ -185,7 +288,6 @@ class Content:
                     var figure = JSON.parse(plotlyData.replace(/\\u2019/g, "'").replace(/\\\\"/g, '"'));
 
                     if (typeof Plotly !== 'undefined') {{
-                        // Configuration par défaut pour une meilleure responsivité
                         var config = {{
                             responsive: true,
                             displayModeBar: true,

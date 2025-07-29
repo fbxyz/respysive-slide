@@ -28,6 +28,53 @@ styles = [
 # Add the title page to the slide
 slide1.add_title_page(title_page_content, styles)
 
+## Slide 1b: Split Title Page Alternative ##
+
+# Create a slide with split title page layout
+slide1b = Slide(center=True)
+
+# Content for the split title page
+split_title_content = {
+    'title': 'Your presentation title',
+    'subtitle': 'Your subtitle',
+    'authors': 'Author 1, Author 2',
+}
+
+# Styles for the title elements  
+title_styles = [
+    {'color': '#e63946', 'font-weight': 'bold', 'font-size': '60px'},  # title
+    {'color': '#457b9d', 'font-size': '40px'},  # subtitle
+    {'color': '#457b9d', 'font-size': '25px'},  # authors
+]
+
+# Style for the title column 
+title_column_style = {
+    'background-color': '#1d3557', 
+    'color': '#f1faee',             
+    'padding': '40px',              
+    'border-radius': '10px 0 0 10px'  
+}
+
+# Style for the custom content column 
+image_style = {
+    'text-align': 'center',
+    'padding': '30px',
+    'background-color': '#e63946',
+    'border-radius': '0 10px 10px 0'  
+}
+
+# Add the split title page - title on left (8 cols), logo on right (4 cols)
+slide1b.add_split_title_page(
+    title_page_content=split_title_content,
+    custom_content=logo_url,
+    title_column_width=8,
+    custom_column_width=4,
+    title_page_class="split-intro",
+    custom_content_style=image_style,
+    title_styles=title_styles,
+    title_column_style=title_column_style  
+)
+
 ## Slide 2 ##
 
 # Create the second slide
@@ -65,7 +112,7 @@ très petites échelles.
 """)
 
 # Add image url
-url = "https://upload.wikimedia.org/wikipedia/commons/d/d5/Univers_Fractal_J.H..jpg"
+url = "./assets/img/Univers_Fractal_J.H..jpg"
 
 # Add Heading to slide
 slide3.add_title("Bootstrap powering")
@@ -105,6 +152,77 @@ css_txt = [{'class': 'stretch'}]
 
 # add the scatter plot to the slide
 slide4.add_content([j], columns=[12], styles=css_txt)
+
+## Slide 4bis : Shared GeoJSON example ##
+slide_maps = Slide()
+slide_maps.add_title("Sharing GeoJSON data between multiple Plotly charts", **{'class': 'r-fit-text'})
+
+# Load GeoJSON data
+from urllib.request import urlopen
+import json
+with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
+    counties = json.load(response)
+
+# Load unemployment data
+import pandas as pd
+df_counties = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/fips-unemp-16.csv",
+                   dtype={"fips": str})
+
+# Add a new column with pandas
+import random
+random.seed(42)
+df_counties['population'] = [random.randint(10000, 500000) for _ in range(len(df_counties))]
+df_counties['income'] = [random.randint(25000, 85000) for _ in range(len(df_counties))]
+
+# Store the GeoJSON data once per slide
+slide_maps.content_obj.add_shared_data("us_counties", counties, "geojson")
+
+# Add context text
+context_text = """
+Large counties GeoJSON data (~2MB) is share only once in a hidden div.
+"""
+
+css_txt = [{'text-align': 'center', 'font-size': "70%"}]
+
+slide_maps.add_content([context_text], columns=[12], styles=css_txt)
+
+# Create first map - Random population using the shared GeoJSON 
+population_config = {
+    "data": [{
+        "type": "choropleth",
+        "locations": df_counties['fips'].tolist(),
+        "z": df_counties['population'].tolist(),
+        "colorscale": "Blues",
+        "colorbar": {"title": "Population"}
+    }],
+    "layout": {
+        "geo": {"projection": {"type": "albers usa"}, "scope": "usa"},
+        "title": "Population by County",
+        "margin": {"r":0,"t":40,"l":0,"b":0}
+    }
+}
+
+# Create second map - Random income using the shared GeoJSON 
+income_config = {
+    "data": [{
+        "type": "choropleth",
+        "locations": df_counties['fips'].tolist(),
+        "z": df_counties['income'].tolist(),
+        "colorscale": "reds",
+        "colorbar": {"title": "Income"}
+    }],
+    "layout": {
+        "geo": {"projection": {"type": "albers usa"}, "scope": "usa"},
+        "title": "Income by County",
+        "margin": {"r":0,"t":40,"l":0,"b":0}
+    }
+}
+
+# Add the two maps side by side - first uses px.choropleth_map normally
+# The second uses shared_data_id to reference the hidden GeoJSON
+slide_maps.add_content([population_config, income_config], 
+                      columns=[6, 6], 
+                      shared_data_ids=["us_counties", "us_counties"])
 
 ## Slide 5 : Altair plot##
 slide5 = Slide()
@@ -150,7 +268,7 @@ plt.plot(x,y,x,z)
 plt.xlabel('x values')
 plt.title('sin and cos ')
 plt.legend(['sin(x)', 'cos(x)'])
-plt.show()
+
 
 # add the  plot to the slide
 slide5_fig.add_content([fig], columns=[12])
@@ -167,6 +285,7 @@ $$f(x) = e^{-x^2}$$
 """
 
 slide6.add_content([math_content], columns=[12])
+
 
 ## Slide 7 : Bootstrap Cards ##
 slide7 = Slide()
@@ -239,7 +358,7 @@ slide11.add_content([text])
 slide11.add_content([sw])
 
 # Adding slide to the presentation
-p.add_slide([slide1, slide2, slide3, slide4, slide5, slide5_fig, slide6, slide7, slide8, [slide9, slide10], slide11])
+p.add_slide([slide1, slide1b, slide2, slide3, slide4, slide_maps, slide5, slide5_fig, slide6, slide7, slide8, [slide9, slide10], slide11])
 
 # Saving the presentation in HTML format
 
