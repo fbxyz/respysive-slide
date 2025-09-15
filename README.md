@@ -570,6 +570,19 @@ text = markdown("""This is a vertical slide""")
 slide10.add_content([text])
 ```
 
+Then, you need to put the slides to combine vertically in a list:
+
+```python
+p = Presentation()
+p.add_slide([
+    slide1,            # Horizontal slide
+    ...             
+    [slide9, slide10], # Vertical slides
+    slide11,           # Horizontal slide
+    ...             
+])
+```
+
 They will be added as list in the next method to export your presentation
 
 ![slide8_9.png](https://raw.githubusercontent.com/fbxyz/respysive-slide/master/assets/img/slide8_9.png)
