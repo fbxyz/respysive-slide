@@ -1,0 +1,32 @@
+/* respysive theme "science": serif headings, booktabs tables, Okabe-Ito colours. */
+:root {
+  --r-background-color: #fdfdfb;
+  --r-main-font: "Source Sans 3", "Source Sans Pro", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --r-main-font-size: 32px;
+  --r-main-color: #222222;
+  --r-block-margin: 18px;
+  --r-heading-margin: 0 0 0.6em 0;
+  --r-heading-font: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", serif;
+  --r-heading-color: #1b2a41;
+  --r-heading-line-height: 1.2;
+  --r-heading-letter-spacing: normal;
+  --r-heading-text-transform: none;
+  --r-heading-text-shadow: none;
+  --r-heading-font-weight: 600;
+  --r-heading1-size: 2em;
+  --r-heading2-size: 1.5em;
+  --r-heading3-size: 1.2em;
+  --r-heading4-size: 1em;
+  --r-code-font: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --r-link-color: #0072b2;
+  --r-link-color-dark: #005a8c;
+  --r-link-color-hover: #3392c8;
+  --r-selection-background-color: #cfe5f2;
+  --r-selection-color: #222222;
+}
+/* booktabs: rules above and below the table, a thin one under the header */
+.reveal table { border-top: 2px solid #222; border-bottom: 2px solid #222; }
+.reveal table thead th { border: none; border-bottom: 1px solid #222; font-weight: 600; }
+.reveal table td, .reveal table tbody th { border: none; }
+.reveal blockquote { box-shadow: none; border-left: 3px solid #0072b2; background: none; }
+.reveal figcaption, .reveal small, .reveal .text-muted { color: #555 !important; font-size: 0.7em; }

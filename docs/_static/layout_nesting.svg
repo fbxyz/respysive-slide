@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 760" font-family="Source Sans Pro, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="1280" height="760" fill="#ffffff"/>
+  <!-- slide -->
+  <rect x="40" y="30" width="1200" height="675" rx="10" fill="#f8f9fa" stroke="#adb5bd" stroke-width="2"/>
+  <text x="60" y="62" font-size="22" fill="#6c757d">Slide, 1280 x 720 px, 12 columns</text>
+  <!-- 12-column grid ticks -->
+  <g stroke="#dee2e6" stroke-width="1">
+    <line x1="160" y1="80" x2="160" y2="690"/><line x1="260" y1="80" x2="260" y2="690"/>
+    <line x1="360" y1="80" x2="360" y2="690"/><line x1="460" y1="80" x2="460" y2="690"/>
+    <line x1="560" y1="80" x2="560" y2="690"/><line x1="660" y1="80" x2="660" y2="690"/>
+    <line x1="760" y1="80" x2="760" y2="690"/><line x1="860" y1="80" x2="860" y2="690"/>
+    <line x1="960" y1="80" x2="960" y2="690"/><line x1="1060" y1="80" x2="1060" y2="690"/>
+    <line x1="1160" y1="80" x2="1160" y2="690"/>
+  </g>
+  <!-- title -->
+  <rect x="60" y="90" width="1160" height="60" rx="6" fill="#1d3557"/>
+  <text x="80" y="129" font-size="26" fill="#ffffff">slide.add_title("...")</text>
+  <!-- Row -->
+  <rect x="60" y="170" width="1160" height="515" rx="8" fill="none" stroke="#e63946" stroke-width="3" stroke-dasharray="10 6"/>
+  <text x="72" y="196" font-size="22" font-family="monospace" fill="#e63946">Row([...])</text>
+  <!-- Column 7 -->
+  <rect x="75" y="210" width="680" height="460" rx="6" fill="#dbe7f3" stroke="#457b9d" stroke-width="2"/>
+  <text x="95" y="245" font-size="24" font-family="monospace" fill="#1d3557">Column(7, map)</text>
+  <text x="415" y="450" font-size="30" text-anchor="middle" fill="#457b9d">7 of 12 columns</text>
+  <!-- Column 5 -->
+  <rect x="770" y="210" width="435" height="460" rx="6" fill="#ffffff" stroke="#457b9d" stroke-width="2"/>
+  <text x="790" y="245" font-size="24" font-family="monospace" fill="#1d3557">Column(5, [</text>
+  <rect x="790" y="262" width="395" height="180" rx="6" fill="#fde8ea" stroke="#e63946" stroke-width="2"/>
+  <text x="810" y="296" font-size="22" font-family="monospace" fill="#c1121f">Row(chart),</text>
+  <rect x="790" y="455" width="395" height="180" rx="6" fill="#fde8ea" stroke="#e63946" stroke-width="2"/>
+  <text x="810" y="489" font-size="22" font-family="monospace" fill="#c1121f">Row(comment),</text>
+  <text x="790" y="660" font-size="24" font-family="monospace" fill="#1d3557">])</text>
+  <!-- caption -->
+  <text x="640" y="740" font-size="22" text-anchor="middle" fill="#495057">A Row holds Columns side by side. A Column holds Rows stacked one above the other.</text>
+</svg>

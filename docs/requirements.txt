@@ -1,0 +1,11 @@
+sphinx>=7
+furo
+sphinx-gallery>=0.16
+sphinx-copybutton
+sphinx-autodoc-typehints
+playwright
+markdown
+matplotlib
+plotly
+altair
+pandas

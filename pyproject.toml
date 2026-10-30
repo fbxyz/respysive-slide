@@ -1,0 +1,89 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "respysive-slide"
+authors = [{name = "fbxyz"}]
+description = "Create interactive HTML presentations from Python, with Bootstrap layouts, Plotly, Altair and Matplotlib charts, and maps"
+dependencies = [
+    'beautifulsoup4', 'requests', 'matplotlib'
+]
+
+readme = "README.md"
+version = "2.0.0"
+license = {file = "LICENSE"}
+classifiers = ["License :: OSI Approved :: MIT License"]
+keywords = ["slide", "presentation", "Bootstrap", "plotly", "altair", "pandas"]
+requires-python = ">=3.10"
+
+[tool.flit.module]
+name = "respysive"
+
+[project.optional-dependencies]
+dev = [
+    "ipython",
+    "markdown",
+    "plotly",
+    "altair",
+    "python-pptx",
+    "pillow",
+    "playwright",
+    "pytest>=8",
+    "pytest-cov",
+    "ruff",
+    "pre-commit",
+]
+pdf = ["playwright"]
+pptx = ["playwright", "python-pptx"]
+docs = ["sphinx>=7", "furo", "sphinx-gallery>=0.16", "sphinx-copybutton", "sphinx-autodoc-typehints", "playwright", "markdown", "matplotlib", "plotly", "altair", "pandas"]
+
+[project.urls]
+Home = "https://github.com/fbxyz/respysive-slide"
+Documentation = "https://fbxyz.github.io/respysive-slide/"
+Changelog = "https://github.com/fbxyz/respysive-slide/blob/master/CHANGELOG.md"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = ["docs", "respysive_back", "temp", "documentations"]
+
+[tool.ruff.format]
+line-ending = "lf"
+# Code blocks in Markdown documentation are left as written
+exclude = ["*.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+# Line length is left to the formatter
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tutorial scripts import each library where it is first used
+"examples/*" = ["E402"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+markers = [
+    "unit: unit tests",
+    "integration: integration tests",
+    "slow: slow tests (headless browser)",
+    "runtime: slide runtime (navigation, fragments, overflow)",
+    "maplibre: MapLibre functionality",
+    "handlers: handler system",
+    "presentation: Presentation class",
+    "slide: Slide class",
+    "utilities: utility functions",
+    "requires_matplotlib: needs matplotlib",
+    "requires_plotly: needs plotly",
+    "requires_network: needs network access",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["respysive"]

@@ -1,0 +1,48 @@
+/* Live decks embedded in the pages */
+.rs-demo {
+  margin: 1rem 0 1.75rem;
+}
+
+.rs-demo iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--color-background-border);
+  border-radius: 8px 8px 0 0;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+.rs-demo-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--color-background-border);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: var(--color-background-secondary);
+  color: var(--color-foreground-secondary);
+  font-size: 0.8rem;
+}
+
+.rs-demo-bar button {
+  padding: 0.15rem 0.7rem;
+  border: 1px solid var(--color-background-border);
+  border-radius: 4px;
+  background: var(--color-background-primary);
+  color: var(--color-foreground-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* Layout diagram */
+.rs-figure {
+  margin: 1rem 0 1.5rem;
+}
+
+.rs-figure img {
+  width: 100%;
+  border: 1px solid var(--color-background-border);
+  border-radius: 8px;
+}

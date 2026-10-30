@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+.ipynb_checkpoints/
+.venv/
+
+# Sphinx gallery output, rebuilt by "make html"
+docs/gallery/
+docs/sg_execution_times.rst
+docs/_build/
+
+# Local material, kept out of the repository
+docs/_old/
+respysive_back/
+.idea/
+.vscode/
+temp/

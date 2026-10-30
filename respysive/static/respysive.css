@@ -1,0 +1,582 @@
+/*
+ * respysive runtime styles.
+ *
+ * The deck keeps Reveal.js class names (.reveal, .slides, section, .controls,
+ * .progress, .slide-number) so Reveal.js themes and existing custom CSS keep
+ * applying. Slide geometry comes from --rs-w / --rs-h set on .rs-canvas.
+ */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.reveal-viewport {
+  background-color: var(--r-background-color, #fff);
+}
+
+/* Base typography when no theme is loaded (zero specificity: themes win) */
+:where(.reveal) {
+  font-family: var(--r-main-font, "Source Sans Pro", Helvetica, sans-serif);
+  font-size: var(--r-main-font-size, 40px);
+  color: var(--r-main-color, #222);
+}
+
+/* ------------------------------------------------------------------ deck */
+
+.reveal.rs-deck {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: pinch-zoom;
+  transition: background-color 0.5s ease;
+}
+
+.rs-embedded .reveal.rs-deck {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.reveal .slides.rs-canvas {
+  position: relative;
+  flex: none;
+  width: var(--rs-w, 1280px);
+  height: var(--rs-h, 720px);
+  text-align: center;
+  transform-origin: center center;
+}
+
+.reveal .slides > section.stack {
+  position: absolute;
+  inset: 0;
+}
+
+.reveal .slides section.rs-slide {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: var(--rs-slide-padding, 20px 0);
+  overflow: hidden;
+  line-height: 1.3;
+  visibility: hidden;
+  z-index: 1;
+}
+
+.rs-center .reveal .slides section.rs-slide,
+.reveal .slides section.rs-slide.center {
+  justify-content: center;
+}
+
+.reveal .slides section.rs-slide.present {
+  visibility: visible;
+  z-index: 2;
+}
+
+.reveal .rs-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* On screen, as in Reveal.js, slide backgrounds cover the whole window: the
+   runtime copies them into .rs-backgrounds, behind the scaled canvas. The
+   copy inside the slide serves the overview, print and exports. */
+.reveal .rs-backgrounds {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.reveal .rs-backgrounds > .rs-bg-view {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0s linear 0.5s;
+}
+
+.reveal .rs-backgrounds > .rs-bg-view.present {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s ease, visibility 0s;
+}
+
+.rs-transition-none .reveal .rs-backgrounds > .rs-bg-view { transition: none; }
+
+.rs-viewport-bg .reveal .slides section.rs-slide > .rs-bg { visibility: hidden; }
+
+.rs-overview .reveal .rs-backgrounds,
+.rs-print .reveal .rs-backgrounds,
+.rs-blackout .reveal .rs-backgrounds { display: none; }
+
+.rs-overview.rs-viewport-bg .reveal .slides section.rs-slide > .rs-bg,
+.rs-print.rs-viewport-bg .reveal .slides section.rs-slide > .rs-bg { visibility: inherit; }
+
+.reveal .rs-body {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  font-size: calc(var(--rs-fit, 1) * 1em);
+}
+
+.reveal .slides section.rs-slide[data-overflow="visible"] {
+  overflow: visible;
+}
+
+.reveal aside.notes {
+  display: none !important;
+}
+
+/* ----------------------------------------------------------- transitions */
+
+.rs-transition-slide .reveal .slides section.rs-slide,
+.rs-transition-fade .reveal .slides section.rs-slide {
+  transition: transform 0.5s cubic-bezier(0.26, 0.86, 0.44, 0.985),
+              opacity 0.5s ease,
+              visibility 0s linear 0.5s;
+}
+
+.rs-transition-slide .reveal .slides section.rs-slide.present,
+.rs-transition-fade .reveal .slides section.rs-slide.present {
+  transition: transform 0.5s cubic-bezier(0.26, 0.86, 0.44, 0.985),
+              opacity 0.5s ease,
+              visibility 0s;
+}
+
+.rs-transition-slide .reveal .slides section.rs-slide.past { transform: translateX(-150%); }
+.rs-transition-slide .reveal .slides section.rs-slide.future { transform: translateX(150%); }
+.rs-transition-slide .reveal .slides section.rs-slide.past-v { transform: translateY(-150%); }
+.rs-transition-slide .reveal .slides section.rs-slide.future-v { transform: translateY(150%); }
+
+.rs-transition-fade .reveal .slides section.rs-slide:not(.present) { opacity: 0; }
+
+/* ------------------------------------------------------------- fragments */
+
+.reveal .fragment {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, transform 0.25s ease, color 0.25s ease, visibility 0s linear 0.25s;
+}
+
+.reveal .fragment.visible {
+  opacity: 1;
+  visibility: inherit;
+  transition: opacity 0.25s ease, transform 0.25s ease, color 0.25s ease, visibility 0s;
+}
+
+.reveal .fragment.fade-up { transform: translateY(40px); }
+.reveal .fragment.fade-down { transform: translateY(-40px); }
+.reveal .fragment.fade-left { transform: translateX(40px); }
+.reveal .fragment.fade-right { transform: translateX(-40px); }
+.reveal .fragment.fade-up.visible,
+.reveal .fragment.fade-down.visible,
+.reveal .fragment.fade-left.visible,
+.reveal .fragment.fade-right.visible { transform: none; }
+
+.reveal .fragment.fade-out,
+.reveal .fragment.semi-fade-out,
+.reveal .fragment.grow,
+.reveal .fragment.shrink,
+.reveal .fragment.strike,
+.reveal .fragment[class*="highlight-"] {
+  opacity: 1;
+  visibility: inherit;
+}
+
+.reveal .fragment.fade-out.visible { opacity: 0; visibility: hidden; }
+.reveal .fragment.semi-fade-out.visible { opacity: 0.5; }
+.reveal .fragment.grow.visible { transform: scale(1.3); }
+.reveal .fragment.shrink.visible { transform: scale(0.7); }
+.reveal .fragment.strike.visible { text-decoration: line-through; }
+.reveal .fragment.current-visible.visible:not(.current-fragment) { opacity: 0; visibility: hidden; }
+.reveal .fragment.highlight-red.visible,
+.reveal .fragment.highlight-current-red.current-fragment { color: #ff2c2d; }
+.reveal .fragment.highlight-green.visible,
+.reveal .fragment.highlight-current-green.current-fragment { color: #17ff2e; }
+.reveal .fragment.highlight-blue.visible,
+.reveal .fragment.highlight-current-blue.current-fragment { color: #1b91ff; }
+
+/* --------------------------------------------- Reveal.js layout helpers */
+
+/* r-stack: children overlap, to swap them with fragments */
+.reveal .r-stack {
+  display: grid;
+  grid-template-rows: 100%;
+}
+
+.reveal .r-stack > * {
+  grid-area: 1 / 1;
+  margin: auto;
+}
+
+.reveal .r-hstack,
+.reveal .r-vstack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reveal .r-hstack { flex-direction: row; }
+.reveal .r-vstack { flex-direction: column; }
+
+.reveal .r-hstack img,
+.reveal .r-hstack video,
+.reveal .r-vstack img,
+.reveal .r-vstack video {
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+}
+
+/* r-fit-text: sized by the runtime to fill its container on one line */
+.reveal .r-fit-text {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- chrome */
+
+.reveal .controls {
+  position: absolute;
+  right: 14px;
+  bottom: 38px;
+  width: 84px;
+  height: 84px;
+  z-index: 20;
+  color: var(--r-link-color, #2a76dd);
+  pointer-events: none;
+}
+
+.reveal .controls button {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.reveal .controls button.enabled {
+  opacity: 0.9;
+  pointer-events: auto;
+}
+
+.reveal .controls button.enabled:hover { opacity: 1; }
+
+.reveal .controls svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.reveal .controls .navigate-left { left: 0; top: 28px; }
+.reveal .controls .navigate-right { right: 0; top: 28px; }
+.reveal .controls .navigate-up { left: 28px; top: 0; }
+.reveal .controls .navigate-down { left: 28px; bottom: 0; }
+
+/* display and radius reset Bootstrap's own .progress component */
+.reveal .progress {
+  position: absolute;
+  display: block;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  z-index: 20;
+  color: var(--r-link-color, #2a76dd);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0;
+}
+
+.reveal .progress span {
+  display: block;
+  height: 100%;
+  background-color: currentColor;
+  transform-origin: left center;
+  transition: transform 0.6s cubic-bezier(0.26, 0.86, 0.44, 0.985);
+}
+
+.reveal .slide-number {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 21;
+  padding: 4px 6px;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.rs-blackout .reveal .slides { visibility: hidden; }
+.rs-blackout .reveal .slides section.rs-slide { visibility: hidden !important; }
+
+/* -------------------------------------------------------------- overview */
+
+.rs-overview .reveal .slides section.rs-slide {
+  visibility: visible;
+  opacity: 1 !important;
+  cursor: pointer;
+  outline: 12px solid rgba(127, 127, 127, 0.25);
+  transition: transform 0.4s ease;
+}
+
+.rs-overview .reveal .slides section.rs-slide > * { pointer-events: none; }
+
+.rs-overview .reveal .slides section.rs-slide.present {
+  outline: 12px solid var(--r-link-color, #2a76dd);
+}
+
+.rs-overview .reveal .slides section.rs-slide:hover {
+  outline-color: var(--r-link-color-hover, #6ca0e8);
+}
+
+.rs-overview .reveal .controls,
+.rs-overview .reveal .slide-number { display: none; }
+
+/* ----------------------------------------------------------- speaker view */
+
+.rs-speaker-mode .reveal.rs-deck { visibility: hidden; }
+
+.rs-speaker {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 62fr) minmax(0, 38fr);
+  gap: 12px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: #1c1c1c;
+  color: #eee;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  z-index: 100;
+}
+
+.rs-speaker iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+}
+
+.rs-sp-current { min-height: 0; }
+
+.rs-sp-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.rs-sp-label { font-size: 13px; text-transform: uppercase; opacity: 0.6; }
+
+.rs-sp-next {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  flex: none;
+}
+
+.rs-sp-end {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  opacity: 0.8;
+}
+
+.rs-sp-done .rs-sp-end { display: flex; }
+
+.rs-sp-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 26px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rs-sp-timer { cursor: pointer; color: #9fd36b; }
+
+.rs-sp-notes {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  background: #2a2a2a;
+  line-height: 1.45;
+}
+
+.rs-sp-empty { opacity: 0.5; font-style: italic; }
+
+/* ------------------------------------------------------------- preview */
+
+.rs-mode-preview .reveal .controls,
+.rs-mode-preview .reveal .progress,
+.rs-mode-preview .reveal .slide-number { display: none; }
+
+/* --------------------------------------------------------- print / PDF */
+
+html.rs-print,
+html.rs-print body {
+  width: auto;
+  height: auto;
+  overflow: visible;
+}
+
+.rs-print .reveal.rs-deck {
+  position: static;
+  display: block;
+  overflow: visible;
+}
+
+.rs-print .reveal .slides.rs-canvas {
+  width: auto;
+  height: auto;
+  transform: none !important;
+}
+
+.rs-print .reveal .slides > section.stack {
+  position: static;
+}
+
+.rs-print .reveal .slides section.rs-slide {
+  position: relative;
+  inset: auto;
+  width: var(--rs-w, 1280px);
+  height: var(--rs-h, 720px);
+  overflow: hidden !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  break-after: page;
+  page-break-after: always;
+}
+
+.rs-print .reveal .slides section.rs-slide.rs-last {
+  break-after: auto;
+  page-break-after: auto;
+}
+
+.rs-print .reveal .fragment {
+  transition: none !important;
+}
+
+.rs-print .reveal .controls,
+.rs-print .reveal .progress,
+.rs-print .reveal .slide-number {
+  display: none;
+}
+
+@media print {
+  .reveal .controls,
+  .reveal .progress,
+  .reveal .slide-number {
+    display: none;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* --------------------------------------------------- respysive helpers */
+
+.reveal svg { max-width: 100%; height: auto; }
+.reveal img { max-width: 100%; height: auto; }
+.reveal div[id^="plotly-chart-"],
+.reveal .plotly-graph-div { max-width: 100%; }
+
+.reveal .text-small { font-size: 55% !important; line-height: 1.3 !important; }
+.reveal .list-small { font-size: 55% !important; margin-left: 0 !important; padding-left: 1.2rem !important; }
+.reveal .list-item-small { font-size: 55% !important; margin-bottom: 0.2rem !important; }
+
+.reveal .card.title-only {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 120px !important;
+}
+
+.reveal .card.title-only .card-body {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.reveal .card-graph { margin: 10px 0; }
+
+.reveal .card-graph svg,
+.reveal .card-graph canvas,
+.reveal .card-graph .plotly-graph-div {
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 300px !important;
+}
+
+.reveal .card-graph .js-plotly-plot { max-height: 300px !important; }
+
+/* full-height split title pages */
+.reveal .slides section.rs-slide.full-height-slide { padding: 0; }
+
+.reveal .slides section.rs-slide.full-height-slide > .rs-body {
+  flex: 1 1 auto;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.reveal .fullscreen-split-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.reveal .fullscreen-split-container .split-left,
+.reveal .fullscreen-split-container .split-right {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.reveal .fullscreen-split-container img {
+  max-width: 100%;
+  max-height: 90%;
+  object-fit: contain;
+}

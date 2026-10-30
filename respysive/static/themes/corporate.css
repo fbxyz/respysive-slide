@@ -1,0 +1,31 @@
+/* respysive theme "corporate": navy titles marked by an orange bar. */
+:root {
+  --r-background-color: #ffffff;
+  --r-main-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --r-main-font-size: 32px;
+  --r-main-color: #2b2f36;
+  --r-block-margin: 20px;
+  --r-heading-margin: 0 0 0.6em 0;
+  --r-heading-font: var(--r-main-font);
+  --r-heading-color: #1b2b48;
+  --r-heading-line-height: 1.15;
+  --r-heading-letter-spacing: normal;
+  --r-heading-text-transform: none;
+  --r-heading-text-shadow: none;
+  --r-heading-font-weight: 700;
+  --r-heading1-size: 2.1em;
+  --r-heading2-size: 1.6em;
+  --r-heading3-size: 1.2em;
+  --r-heading4-size: 1em;
+  --r-link-color: #3a6ea5;
+  --r-link-color-dark: #2c5480;
+  --r-link-color-hover: #5a8cc2;
+  --r-selection-background-color: #fbd7cd;
+  --r-selection-color: #1b2b48;
+}
+/* slide titles (add_title writes h3) */
+.reveal h3 { border-left: 0.3em solid #e76f51; padding-left: 0.5em; }
+.reveal ul li::marker, .reveal ol li::marker { color: #e76f51; }
+.reveal table thead th { background: #1b2b48; color: #ffffff; }
+.reveal table td, .reveal table tbody th { border-bottom: 1px solid #e3e6eb; }
+.reveal blockquote { box-shadow: none; border-left: 4px solid #e76f51; background: #f5f7fa; font-style: normal; }
