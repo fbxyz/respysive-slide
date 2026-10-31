@@ -1,0 +1,60 @@
+name: Publish
+
+# Runs on a version tag (git tag -a vX.Y.Z && git push origin vX.Y.Z).
+# Trusted Publishing: no token is stored, PyPI trusts this workflow.
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Check that the tag matches the version
+        run: |
+          version=$(python -c "import re; print(re.search(r'__version__ = \"(.+?)\"', open('respysive/version.py').read()).group(1))")
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match version $version"; exit 1; }
+          grep -q "^version = \"$version\"" pyproject.toml || { echo "pyproject.toml does not have version $version"; exit 1; }
+      - run: python -m pip install flit twine
+      - run: flit build --no-use-vcs && twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/respysive-slide/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  release:
+    needs: pypi
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Create the GitHub release with the changelog section
+        run: |
+          sed -n "/^## ${GITHUB_REF_NAME#v}$/,/^## /p" CHANGELOG.md | sed '1d;$d' > notes.md
+          gh release create "$GITHUB_REF_NAME" dist/* --title "respysive-slide ${GITHUB_REF_NAME#v}" --notes-file notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}
