@@ -2,7 +2,7 @@ respysive-slide
 ===============
 
 respysive-slide builds HTML presentations from Python. Slides are laid out
-on a Bootstrap grid and hold text, images, Plotly, Altair and Matplotlib
+on a Bootstrap grid and hold text, images, Plotly, Altair, and Matplotlib
 charts, maps, and equations. The result is a single HTML file that opens in
 any browser and exports to PDF and PowerPoint.
 

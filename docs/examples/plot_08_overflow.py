@@ -22,8 +22,9 @@ STYLE = """
 px.defaults.template = "plotly_white"
 
 latest = px.data.gapminder().query("year == 2007")
+populated = latest.nlargest(15, "pop")
 table = (
-    latest.nlargest(15, "pop")[["country", "continent", "pop", "lifeExp"]]
+    populated[["country", "continent", "pop", "lifeExp"]]
     .assign(pop=lambda d: (d["pop"] / 1e6).round(1), lifeExp=lambda d: d["lifeExp"].round(1))
     .rename(columns={"country": "Country", "continent": "Continent", "pop": "Population (millions)", "lifeExp": "Life expectancy"})
     .set_index("Country")
@@ -38,7 +39,7 @@ table = (
 # HTML table.
 
 long = Slide()
-long.add_title("The fifteen most populated countries, 2007")
+long.add_title(f"{(populated['lifeExp'] >= 70).sum()} of the {len(populated)} most populated countries live past 70 years")
 long.add_content([table])
 
 # %%
@@ -49,7 +50,7 @@ long.add_content([table])
 # content then scales down, like a picture, and keeps its layout.
 
 bars = px.bar(
-    latest.nlargest(15, "pop").sort_values("lifeExp"),
+    populated.sort_values("lifeExp"),
     x="lifeExp",
     y="country",
     orientation="h",
@@ -59,7 +60,8 @@ bars = px.bar(
 bars.update_layout(height=640, margin=dict(l=10, r=10, t=10, b=10))
 
 both = Slide()
-both.add_title("Population and life expectancy")
+longest, shortest = populated.nlargest(1, "lifeExp").iloc[0], populated.nsmallest(1, "lifeExp").iloc[0]
+both.add_title(f"{longest.country} lives {longest.lifeExp - shortest.lifeExp:.0f} years longer than {shortest.country}")
 both.add_content([table, bars], columns=[7, 5])
 
 # %%

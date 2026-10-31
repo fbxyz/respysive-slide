@@ -22,3 +22,8 @@ without downloading anything.
   to about 1 km and in longitude/latitude, with the department code.
 - Source: IGN, GéoFLA.
 - Licence: Licence Ouverte / Open Licence (Etalab).
+
+## life_curves.png
+- Picture: life expectancy at birth of each country, 1952-2007, with the
+  world mean weighted by population. Drawn by `make_life_curves.py`.
+- Source: Gapminder, data set shipped with Plotly (`px.data.gapminder()`).

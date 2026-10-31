@@ -42,6 +42,10 @@ breaks = mapclassify.Quantiles(departments["taux_mortalite"], k=5).bins
 colors = ["#fee5d9", "#fcae91", "#fb6a4a", "#de2d26", "#a50f15"]
 lower = [departments["taux_mortalite"].min(), *breaks[:-1]]
 labels = [f"{a:.0f} to {b:.0f}" for a, b in zip(lower, breaks)]
+ranked = departments.sort_values("taux_mortalite")
+highest = ranked.iloc[-1]
+SOURCE = "Standardised rates, 2020-2022. Source: Sante publique France (ODISSE), IGN (GéoFLA)."
+CAPTION = {"font-size": "50%", "text-align": "center", "color": "#6b7280", "margin-top": "8px"}
 departments["class"] = pd.cut(departments["taux_mortalite"], [-float("inf"), *breaks], labels=labels).astype(str)
 
 # %%
@@ -80,8 +84,12 @@ svg_map = (
 )
 
 svg_slide = Slide()
-svg_slide.add_title("mappyng: computed in Python, works offline")
+svg_slide.add_title(
+    f"{(departments['class'] == labels[-1]).sum()} departments count {lower[-1]:.0f} "
+    "or more heart failure deaths per 100,000"
+)
 svg_slide.add_content([svg_map.to_interactive()])
+svg_slide.add_content([f"Drawn by mappyng. {SOURCE}"], styles=[CAPTION])
 
 # %%
 # Plotly: a tile map that reads the shared GeoJSON
@@ -113,8 +121,9 @@ fig.update_layout(
 )
 
 plotly_slide = Slide()
-plotly_slide.add_title("Plotly: the same polygons, read from the deck")
+plotly_slide.add_title(f"{ranked.iloc[0].libgeo} and {ranked.iloc[1].libgeo} have the lowest rates")
 plotly_slide.add_content([fig], shared_data_ids=["departments"])
+plotly_slide.add_content([f"Plotly tile map. {SOURCE}"], styles=[CAPTION])
 
 # %%
 # MapLibre: the values joined in the browser
@@ -130,7 +139,7 @@ join_data = {
 rules = [{"operator": ">=", "value": round(float(low), 2), "color": color} for low, color in zip(lower, colors)]
 
 web_slide = Slide()
-web_slide.add_title("MapLibre: the same polygons, joined to the values")
+web_slide.add_title(f"{highest.libgeo} has the highest rate, {highest.taux_mortalite:.0f} deaths per 100,000")
 web_slide.add_maplibre_choropleth_with_data_join(
     center=[2.5, 46.6],
     zoom=4,
@@ -148,6 +157,7 @@ web_slide.add_maplibre_choropleth_with_data_join(
         },
     },
 )
+web_slide.add_content([f"MapLibre map, values joined in the browser. {SOURCE}"], styles=[CAPTION])
 
 deck.add_slide([svg_slide, plotly_slide, web_slide])
 deck.save_html("shared_geojson.html", theme="sober")

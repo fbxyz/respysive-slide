@@ -94,7 +94,7 @@ as a string. The main options:
      - Size the deck to its parent element, to place it inside a page
    * - ``offline``
      - ``False``
-     - Embed every library, stylesheet and font
+     - Embed every library, stylesheet, and font
 
 Libraries
 ---------

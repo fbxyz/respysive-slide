@@ -29,6 +29,8 @@ px.defaults.color_discrete_sequence = PALETTE
 
 gapminder = px.data.gapminder()
 latest = gapminder.query("year == 2007")
+life = gapminder.pivot(index="year", columns="country", values="lifeExp")
+first_year, last_year = life.index.min(), life.index.max()
 
 # %%
 # Plotly
@@ -51,7 +53,7 @@ bubbles = px.scatter(
 bubbles.update_layout(height=540, margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.08))
 
 plotly_slide = Slide()
-plotly_slide.add_title("Plotly: income and life expectancy, 2007")
+plotly_slide.add_title(f"Richer countries live longer, {last_year}")
 plotly_slide.add_content([bubbles])
 
 # %%
@@ -77,7 +79,9 @@ lines = (
 )
 
 altair_slide = Slide()
-altair_slide.add_title("Altair: five countries, 1952-2007")
+altair_slide.add_title(
+    f"Japan rose from {life.loc[first_year, 'Japan']:.0f} to {life.loc[last_year, 'Japan']:.0f} years and overtook France"
+)
 altair_slide.add_content([lines])
 
 # %%
@@ -97,13 +101,15 @@ ax.legend(frameon=False, ncol=5, loc="upper center", bbox_to_anchor=(0.5, 1.12))
 mpl_fig.tight_layout()
 
 mpl_slide = Slide()
-mpl_slide.add_title("Matplotlib: the gap between continents")
+gain = means.loc[last_year] - means.loc[first_year]
+gap = means["Europe"] - means["Asia"]
+mpl_slide.add_title(f"Asia gained {gain['Asia']:.0f} years of life, Europe {gain['Europe']:.0f}")
 mpl_slide.add_content(
     [
         mpl_fig,
         markdown(
-            "Between 1952 and 2007, mean life expectancy rose by **24 years** in Asia "
-            "and by **13 years** in Europe, where it started 18 years higher."
+            f"Mean of the countries of each continent. Europe led Asia by **{gap[first_year]:.0f} years** "
+            f"in {first_year}, by **{gap[last_year]:.0f}** in {last_year}."
         ),
     ],
     columns=[8, 4],
@@ -134,7 +140,7 @@ def top_countries(continent):
 
 
 pair = Slide()
-pair.add_title("Two charts side by side")
+pair.add_title("The most populated countries live longer in Asia than in Africa")
 pair.add_content([top_countries("Africa"), top_countries("Asia")], columns=[6, 6])
 
 deck = Presentation()

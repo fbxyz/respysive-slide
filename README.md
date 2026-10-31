@@ -5,7 +5,7 @@
 [![Docs](https://github.com/fbxyz/respysive-slide/actions/workflows/docs.yml/badge.svg)](https://fbxyz.github.io/respysive-slide/)
 
 Interactive HTML presentations written in Python. Slides take text, Markdown,
-LaTeX, images, Plotly, Altair and Matplotlib charts, and maps, laid out on a
+LaTeX, images, Plotly, Altair, and Matplotlib charts, and maps, laid out on a
 Bootstrap grid. A deck is a single HTML file that opens in any browser, and it
 exports to PDF and to PowerPoint with editable text and charts.
 
@@ -46,7 +46,7 @@ title = Slide(center=True)
 title.add_title_page({"title": "World health", "subtitle": "Gapminder data, 2007"})
 
 chart = Slide()
-chart.add_title("Life expectancy and income")
+chart.add_title("Richer countries live longer")
 chart.add_content([fig, "Each bubble is a country, sized by its population."], columns=[8, 4])
 chart.add_notes("Start with the cluster of African countries on the left.")
 

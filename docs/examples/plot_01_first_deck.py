@@ -31,6 +31,10 @@ PALETTE = ["#1d3557", "#e63946", "#457b9d", "#f4a261", "#2a9d8f"]
 px.defaults.template = "plotly_white"
 px.defaults.color_discrete_sequence = PALETTE
 
+gapminder = px.data.gapminder()
+first_year, last_year = gapminder["year"].min(), gapminder["year"].max()
+n_countries = gapminder["country"].nunique()
+
 # %%
 # Title page
 # ----------
@@ -57,13 +61,12 @@ title.add_title_page(
 # `Font Awesome <https://fontawesome.com/icons>`_ class.
 
 text = Slide()
-text.add_title("What the data cover", icon="fas fa-earth-africa")
+text.add_title(f"{n_countries} countries followed from {first_year} to {last_year}", icon="fas fa-earth-africa")
 text.add_content(
     [
         markdown(
             """
-The Gapminder data set follows **142 countries** from 1952 to 2007,
-every five years.
+The Gapminder data set gives one value every five years for each country.
 
 - Life expectancy at birth, in years
 - GDP per capita, in US dollars adjusted for inflation
@@ -82,7 +85,8 @@ text.add_notes("The data set ships with Plotly: px.data.gapminder().")
 # the text. The chart stays interactive: hover a bubble to read the
 # country.
 
-df = px.data.gapminder().query("year == 2007")
+df = gapminder.query("year == @last_year")
+first, last = df.nlargest(1, "lifeExp").iloc[0], df.nsmallest(1, "lifeExp").iloc[0]
 fig = px.scatter(
     df,
     x="gdpPercap",
@@ -97,11 +101,15 @@ fig = px.scatter(
 fig.update_layout(height=540, margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.08))
 
 chart = Slide()
-chart.add_title("Richer countries live longer")
+chart.add_title(f"Richer countries live longer, {last_year}")
 chart.add_content(
     [
         fig,
-        markdown("Japan leads with **82.6 years**.\n\nSwaziland comes last with **39.6 years**, 43 years less."),
+        markdown(
+            f"{first.country} leads with **{first.lifeExp:.1f} years**.\n\n"
+            f"{last.country} comes last with **{last.lifeExp:.1f} years**, "
+            f"{first.lifeExp - last.lifeExp:.0f} years less."
+        ),
     ],
     columns=[8, 4],
     styles=[None, {"font-size": "75%", "align-self": "center"}],

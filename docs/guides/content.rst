@@ -18,7 +18,7 @@ when a slide contains one.
    from respysive import Presentation, Slide
 
    slide = Slide()
-   slide.add_title("Standardised rates", icon="fas fa-calculator")
+   slide.add_title("A standardised rate does not depend on age structure", icon="fas fa-calculator")
    slide.add_content([markdown(
        "A crude rate divides the deaths by the population.\n\n"
        "- It depends on the **age structure**\n"
@@ -56,8 +56,8 @@ inserted through that method. A pandas ``DataFrame`` becomes a table.
           [["country", "lifeExp"]].set_index("country").round(1))
 
    slide = Slide()
-   slide.add_title("An image and a table")
-   slide.add_content(["data/fractal.jpg", top], columns=[5, 7], styles=[None, {"font-size": "70%"}])
+   slide.add_title("Japan, Hong Kong, and Iceland have the longest lives in 2007")
+   slide.add_content(["data/life_curves.png", top], columns=[7, 5], styles=[None, {"font-size": "70%"}])
 
    deck = Presentation()
    deck.add_slide([slide])

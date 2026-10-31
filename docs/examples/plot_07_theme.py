@@ -51,7 +51,8 @@ fig = px.box(
 fig.update_layout(height=500, margin=dict(l=10, r=10, t=10, b=10), showlegend=False, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
 
 dark = Slide(**{"class": "branded"})
-dark.add_title("Life expectancy by continent")
+spread = df.groupby("continent")["lifeExp"].agg(lambda s: s.max() - s.min())
+dark.add_title(f"Within Asia, life expectancy spans {spread['Asia']:.0f} years, within Europe {spread['Europe']:.0f}")
 dark.add_content([fig])
 
 # %%
@@ -64,19 +65,19 @@ dark.add_content([fig])
 gradient = Slide(
     center=True, **{"data-background-gradient": "linear-gradient(135deg, #0b2545 0%, #8da9c4 100%)"}
 )
-gradient.add_title("A gradient background", tag="h2")
-gradient.add_content([markdown("`data-background-gradient` takes any CSS gradient.")])
+gradient.add_title("Does income explain longer lives?", tag="h2")
+gradient.add_content([markdown("The next slides compare income and life expectancy, country by country.")])
 
 image = Slide(
     center=True,
     **{
-        "data-background-image": "data/fractal.jpg",
+        "data-background-image": "data/life_curves.png",
         "data-background-size": "cover",
-        "data-background-opacity": "0.35",
+        "data-background-opacity": "0.15",
     },
 )
-image.add_title("An image background", tag="h2")
-image.add_content([markdown("`data-background-image` takes a path or a URL.")])
+image.add_title("Thank you", tag="h2")
+image.add_content([markdown("Gapminder data, 1952-2007")])
 
 deck = Presentation()
 deck.add_custom_css(CSS)

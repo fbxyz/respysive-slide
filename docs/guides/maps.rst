@@ -49,7 +49,7 @@ neighbours of similar colour. mappyng is installed with ``pip install mappyng-sv
        + mp.Choropleth(deps, column="taux_mortalite", cmap="Reds", method="Quantiles", num_classes=5,
                        stroke="#ffffff", stroke_width=0.3, border_contrast=True,
                        legend=mp.Legend("Deaths / 100,000 inhabitants", orientation="horizontal", decimals=0,
-                                        label_rotation=0, nodata_label="No data", swatch_shape="rounded"))
+                                        nodata_label="No data", swatch_shape="rounded"))
        + mp.Vector(regions, stroke="#333333", stroke_width=0.4, position="top")
        + mp.ScaleBar(length=100000, label="100 km", position=(0.55, 0.855), opacity=0.8)
        + mp.Source("Source: Sante publique France (ODISSE)")
@@ -57,7 +57,7 @@ neighbours of similar colour. mappyng is installed with ``pip install mappyng-sv
    )
 
    slide = Slide()
-   slide.add_title("Mortality from heart failure, 2020-2022")
+   slide.add_title("Heart failure deaths are lowest in the Paris area")
    slide.add_content(
        [m.to_interactive(), "Lowest in the Paris area, 25 per 100,000 in Val-de-Marne, highest in Creuse, 71."],
        columns=[8, 4],
@@ -110,7 +110,7 @@ proportional to it. A click on a circle opens its popup.
    ]
 
    slide = Slide()
-   slide.add_title("Air passengers between Paris and Africa, 2024")
+   slide.add_title("Algiers and Tunis lead air traffic between Paris and Africa, 2024")
    slide.add_maplibre_circles_map(center=[10, 15], zoom=2, circles=circles,
                                   legend={"title": "Passengers"}, min_radius=6, max_radius=40)
 
@@ -135,7 +135,7 @@ gives the colour. The popup template reads the GeoJSON properties.
        feature["properties"].update(rates.loc[feature["properties"]["code_dep"]].to_dict())
 
    slide = Slide()
-   slide.add_title("The same rates on a web map")
+   slide.add_title("14 departments count 55 heart failure deaths per 100,000 or more")
    slide.add_maplibre_choropleth_map(
        center=[2.5, 46.6],
        zoom=4,

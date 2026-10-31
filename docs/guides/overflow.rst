@@ -25,7 +25,7 @@ which usually means it should be split.
    items = markdown("\n".join(f"- {r.country}: {r.lifeExp:.1f} years" for r in latest.itertuples()))
 
    text = Slide()
-   text.add_title("A list of 14 countries: the text shrinks")
+   text.add_title(f"The {len(latest)} most populated countries live {latest.lifeExp.min():.0f} to {latest.lifeExp.max():.0f} years")
    text.add_content([items])
 
    bars = px.bar(latest.sort_values("lifeExp"), x="lifeExp", y="country", orientation="h",
@@ -33,7 +33,7 @@ which usually means it should be split.
    bars.update_layout(height=640, margin=dict(l=10, r=10, t=10, b=10))
 
    both = Slide()
-   both.add_title("The same list next to a tall chart: everything scales")
+   both.add_title("Japan lives longest among them, Nigeria shortest")
    both.add_content([items, bars], columns=[5, 7])
 
    deck = Presentation()

@@ -43,7 +43,7 @@ Georgia), so the PowerPoint export looks like the HTML deck.
    chart.add_content([fig, "<ul><li>Brazil: 22 years</li><li>France: 13</li><li>Nigeria: 10</li></ul>"], columns=[8, 4])
 
    table = Slide()
-   table.add_title("Longest lives in 2007")
+   table.add_title("Japan has the longest lives in 2007")
    table.add_content([top], styles=[{"font-size": "80%"}])
 
    deck = Presentation()
@@ -94,8 +94,8 @@ lets the CSS target that slide alone.
    """
 
    slide = Slide(center=True, **{"class": "branded"})
-   slide.add_title("A dark deck", tag="h2")
-   slide.add_content(["The night theme, recoloured with four CSS variables."])
+   slide.add_title("Life expectancy rose on every continent", tag="h2")
+   slide.add_content(["From 1952 to 2007, Gapminder data."])
 
    deck = Presentation()
    deck.add_custom_css(CSS)
@@ -120,14 +120,14 @@ embedded in the HTML file.
    from respysive import Presentation, Slide
 
    gradient = Slide(center=True, **{"data-background-gradient": "linear-gradient(135deg, #1d3557, #457b9d)"})
-   gradient.add_title("A gradient", tag="h2", color="#ffffff")
+   gradient.add_title("Does income explain longer lives?", tag="h2", color="#ffffff")
 
    image = Slide(center=True, **{
-       "data-background-image": "data/fractal.jpg",
+       "data-background-image": "data/life_curves.png",
        "data-background-size": "cover",
-       "data-background-opacity": "0.4",
+       "data-background-opacity": "0.25",
    })
-   image.add_title("An image, dimmed", tag="h2")
+   image.add_title("Life expectancy rose in 140 of 142 countries", tag="h2")
 
    deck = Presentation()
    deck.add_slide([gradient, image])
@@ -152,7 +152,7 @@ makes both columns cover the slide.
    slide = Slide()
    slide.add_split_title_page(
        {"title": "World health", "subtitle": "Gapminder data, 1952-2007", "authors": "Data team"},
-       custom_content="data/fractal.jpg",
+       custom_content="data/life_curves.png",
        title_column_width=7,
        custom_column_width=5,
        full_height=True,
@@ -183,7 +183,7 @@ Cards
    big = {"font-size": "140%", "color": "#e63946"}
 
    slide = Slide()
-   slide.add_title("Japan, 1952-2007")
+   slide.add_title("Japan gained 20 years to reach the longest lives")
    slide.add_card(
        [
            {"title": "82.6 years", "title_style": big, "text": "Life expectancy in 2007, the highest of the data set."},

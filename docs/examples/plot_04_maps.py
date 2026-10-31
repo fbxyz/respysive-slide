@@ -66,7 +66,7 @@ svg_map = (
         border_radius=6,
         box_shadow=True,
     )
-    # Lighter water along the coasts, meridians and parallels under the land
+    # Lighter water along the coasts, then the meridians and parallels under the land
     + mp.OceanGradient(europe)
     + mp.Graticule(step=2, stroke="#ffffff", opacity=0.9, stroke_width=0.7)
     # European countries as background, France lifted by a drop shadow
@@ -85,7 +85,6 @@ svg_map = (
             "Deaths / 100,000 inhabitants",
             orientation="horizontal",
             decimals=0,
-            label_rotation=0,
             nodata_label="No data",
             swatch_shape="rounded",
         ),
@@ -96,10 +95,14 @@ svg_map = (
     + mp.Tooltip(["libgeo", "taux_mortalite"], aliases={"libgeo": "Department", "taux_mortalite": "Rate"})
 )
 
+lowest, highest = rates.nsmallest(1, "taux_mortalite").iloc[0], rates.nlargest(1, "taux_mortalite").iloc[0]
+
 svg_slide = Slide()
-svg_slide.add_title("Mortality from heart failure, 2020-2022")
+svg_slide.add_title(
+    f"Heart failure deaths range from {lowest.taux_mortalite:.0f} to {highest.taux_mortalite:.0f} per 100,000"
+)
 svg_slide.add_content(
-    [svg_map.to_interactive(), "Lowest in the Paris area, highest in Creuse."],
+    [svg_map.to_interactive(), f"Lowest in {lowest.libgeo}, highest in {highest.libgeo}. Standardised rates, 2020-2022."],
     columns=[8, 4],
     styles=[None, {"align-self": "center"}],
 )
@@ -117,20 +120,35 @@ geojson["features"] = [f for f in geojson["features"] if f["properties"]["code_d
 for feature in geojson["features"]:
     feature["properties"].update(rates.loc[feature["properties"]["code_dep"]].to_dict())
 
+HIGH = 55  # deaths per 100,000, upper class of the web map
+SOURCE = {"font-size": "50%", "text-align": "center", "color": "#6b7280", "margin-top": "8px"}
+
 map_slide = Slide()
-map_slide.add_title("Mortality from heart failure, 2020-2022")
+map_slide.add_title(f"{(rates['taux_mortalite'] >= HIGH).sum()} departments count {HIGH} heart failure deaths per 100,000 or more")
 map_slide.add_maplibre_choropleth_map(
     center=[2.5, 46.6],
     zoom=4,
     geojson=geojson,
     color_property="taux_mortalite",
     color_rules=[
-        {"operator": ">=", "value": 55, "color": "#bd0026"},
+        {"operator": ">=", "value": HIGH, "color": "#bd0026"},
         {"operator": ">=", "value": 45, "color": "#fd8d3c"},
         {"operator": "<", "value": 45, "color": "#fed976"},
     ],
     popup="<b>{libgeo}</b><br>{taux_mortalite} per 100,000",
+    legend={
+        "title": "Deaths per 100,000",
+        "choropleth": {
+            "type": "discrete",
+            "items": [
+                {"color": "#bd0026", "label": f"{HIGH} or more"},
+                {"color": "#fd8d3c", "label": f"45 to {HIGH}"},
+                {"color": "#fed976", "label": "Less than 45"},
+            ],
+        },
+    },
 )
+map_slide.add_content(["Standardised rates, 2020-2022. Source: Sante publique France (ODISSE)."], styles=[SOURCE])
 
 # %%
 # Proportional circles with MapLibre
@@ -151,8 +169,10 @@ circles = [
     for row in traffic.itertuples()
 ]
 
+busiest = traffic.nlargest(2, "passengers_2024")["city"].tolist()
+
 web_map = Slide()
-web_map.add_title("Air passengers between Paris and Africa, 2024")
+web_map.add_title(f"{busiest[0]} and {busiest[1]} lead air traffic between Paris and Africa, 2024")
 web_map.add_maplibre_circles_map(
     center=[10, 15],
     zoom=2,
@@ -161,6 +181,7 @@ web_map.add_maplibre_circles_map(
     min_radius=6,
     max_radius=40,
 )
+web_map.add_content(["Passengers carried in 2024. Source: Eurostat (avia_par_fr)."], styles=[SOURCE])
 
 deck = Presentation()
 deck.add_custom_css(STYLE)

@@ -68,7 +68,7 @@ takes the width of its column.
    ax.spines[["top", "right"]].set_visible(False)
 
    slide = Slide()
-   slide.add_title("Altair on the left, Matplotlib on the right")
+   slide.add_title("Richer countries live longer, and most live past 70")
    slide.add_content([chart, fig], columns=[6, 6])
    plt.close(fig)
 
@@ -114,7 +114,7 @@ id of the ``div`` to draw in.
    from respysive import Presentation, Slide
 
    slide = Slide()
-   slide.add_title("A Chart.js chart")
+   slide.add_title("Oceania lives 26 years longer than Africa")
    slide.add_custom_content(
        library="chartjs",
        config={

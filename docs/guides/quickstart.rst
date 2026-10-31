@@ -21,7 +21,7 @@ file.
    title.add_title_page({"title": "World health", "subtitle": "Gapminder data, 2007"})
 
    chart = Slide()
-   chart.add_title("Life expectancy and income")
+   chart.add_title("Richer countries live longer")
    chart.add_content([fig, "Each bubble is a country, sized by its population."], columns=[8, 4])
    chart.add_notes("Start with the cluster of African countries on the left.")
 

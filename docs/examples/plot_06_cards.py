@@ -19,7 +19,8 @@ STYLE = """
 px.defaults.template = "plotly_white"
 px.defaults.color_discrete_sequence = ["#1d3557", "#e63946", "#457b9d", "#f4a261", "#2a9d8f"]
 
-france = px.data.gapminder().query("country == 'France'")
+france = px.data.gapminder().query("country == 'France'").set_index("year", drop=False)
+first, last = france.index.min(), france.index.max()
 
 # %%
 # A split title page
@@ -34,7 +35,7 @@ curve.update_layout(height=520, margin=dict(l=10, r=10, t=10, b=10), paper_bgcol
 
 opening = Slide()
 opening.add_split_title_page(
-    {"title": "France in figures", "subtitle": "Life expectancy, 1952-2007", "authors": "Gapminder data"},
+    {"title": "France in figures", "subtitle": f"Life expectancy, {first}-{last}", "authors": "Gapminder data"},
     custom_content=curve,
     title_column_width=5,
     custom_column_width=7,
@@ -62,12 +63,23 @@ trend = px.line(france, x="year", y="pop", markers=True, labels={"year": "", "po
 trend.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10))
 
 cards = Slide()
-cards.add_title("France, 1952-2007")
+cards.add_title(
+    f"France gained {france.lifeExp[last] - france.lifeExp[first]:.0f} years of life "
+    f"and {(france['pop'][last] - france['pop'][first]) / 1e6:.0f} million inhabitants"
+)
 cards.add_card(
     [
-        {"title": "80.7 years", "title_style": BIG, "text": "Life expectancy at birth in 2007, up from 67.4 in 1952."},
+        {
+            "title": f"{france.lifeExp[last]:.1f} years",
+            "title_style": BIG,
+            "text": f"Life expectancy at birth in {last}, up from {france.lifeExp[first]:.1f} in {first}.",
+        },
         {"title": "Population", "graph": trend},
-        {"title": "61 million", "title_style": BIG, "text": "Inhabitants in 2007, up from 42 million in 1952."},
+        {
+            "title": f"{france['pop'][last] / 1e6:.0f} million",
+            "title_style": BIG,
+            "text": f"Inhabitants in {last}, up from {france['pop'][first] / 1e6:.0f} million in {first}.",
+        },
     ],
     styles=[{"class": "bg-light"}, {"class": "bg-light"}, {"class": "bg-light"}],
 )

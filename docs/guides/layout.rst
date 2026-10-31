@@ -24,9 +24,9 @@ row under the previous one.
    fig.update_layout(height=420, margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.1, title=None))
 
    slide = Slide()
-   slide.add_title("8 columns for the chart, 4 for the text")
+   slide.add_title("India gained 27 years of life, Nigeria 10")
    slide.add_content(
-       [fig, "India gained 27 years of life expectancy between 1952 and 2007, Nigeria 10."],
+       [fig, "Life expectancy at birth, 1952 to 2007. France gained 13 years."],
        columns=[8, 4],
        styles=[None, {"font-size": "75%", "align-self": "center"}],
    )
@@ -63,12 +63,12 @@ on the right:
    bars.update_layout(height=260, margin=dict(l=10, r=10, t=10, b=10))
 
    slide = Slide()
-   slide.add_title("Life expectancy in 2007")
+   slide.add_title("Europe lives 23 years longer than Africa")
    slide.add_layout(
        Row(
            [
                Column(7, world),
-               Column(5, [Row(bars), Row("Europe lives 23 years longer than Africa on average.")],
+               Column(5, [Row(bars), Row("Mean of the countries of each continent, 2007.")],
                       font_size="70%"),
            ],
            gap=4,

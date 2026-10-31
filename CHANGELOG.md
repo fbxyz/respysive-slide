@@ -11,6 +11,11 @@
   countries in the background, the overseas departments in insets, and
   contrasted borders.
 - New gallery example: one GeoJSON shared by mappyng, Plotly, and MapLibre maps.
+- The documentation loads its decks from files: Plotly tile maps stayed blank
+  in the `srcdoc` iframes used before.
+- The slide titles of the examples state what the slide shows, with figures
+  computed from the data, and each map gives its source. A picture drawn from
+  the Gapminder data replaces the fractal image.
 
 ## 2.0.1
 

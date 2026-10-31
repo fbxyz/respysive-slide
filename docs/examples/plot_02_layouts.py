@@ -47,6 +47,17 @@ def figure(value, label):
 gapminder = px.data.gapminder()
 latest = gapminder.query("year == 2007")
 by_continent = latest.groupby("continent", as_index=False)["lifeExp"].mean()
+continent_mean = by_continent.set_index("continent")["lifeExp"]
+first_year, last_year = gapminder["year"].min(), gapminder["year"].max()
+
+
+def gain(country):
+    """Years of life expectancy gained by a country over the period."""
+    years = gapminder.query("country == @country").set_index("year")["lifeExp"]
+    return years[last_year] - years[first_year]
+
+
+world_mean = (latest["lifeExp"] * latest["pop"]).sum() / latest["pop"].sum()
 
 # %%
 # Two columns with ``add_content``
@@ -65,7 +76,7 @@ trend = px.line(
 trend.update_layout(height=460, margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.1))
 
 two = Slide()
-two.add_title("Two columns: 8 + 4")
+two.add_title(f"India gained {gain('India'):.0f} years of life, Nigeria {gain('Nigeria'):.0f}")
 two.add_content(
     [
         tag("columns=[8, 4] → item 1"),
@@ -74,7 +85,7 @@ two.add_content(
     columns=[8, 4],
 )
 two.add_content(
-    [trend, "<p>India gained 27 years of life expectancy between 1952 and 2007, Nigeria 10.</p>"],
+    [trend, f"<p>Life expectancy at birth, {first_year} to {last_year}. France gained {gain('France'):.0f} years.</p>"],
     columns=[8, 4],
     styles=[None, {"font-size": "70%", "align-self": "center"}],
 )
@@ -86,10 +97,14 @@ two.add_content(
 # Each call to ``add_content`` adds a row below the previous one.
 
 three = Slide()
-three.add_title("Three columns: 4 + 4 + 4")
+three.add_title(f"{len(latest)} countries, {latest['pop'].sum() / 1e9:.1f} billion people in {last_year}")
 three.add_content([tag("item 1"), tag("item 2"), tag("item 3")], columns=[4, 4, 4])
 three.add_content(
-    [figure("142", "countries"), figure("68.9", "years of life, world average"), figure("6.3 bn", "inhabitants")],
+    [
+        figure(len(latest), "countries"),
+        figure(f"{world_mean:.1f}", "years of life, world average"),
+        figure(f"{latest['pop'].sum() / 1e9:.1f} bn", "inhabitants"),
+    ],
     columns=[4, 4, 4],
 )
 
@@ -114,7 +129,7 @@ world = px.choropleth(latest, locations="iso_alpha", color="lifeExp", color_cont
 world.update_layout(height=420, margin=dict(l=0, r=0, t=0, b=0), geo=dict(showframe=False))
 
 split = Slide()
-split.add_title("One column split into two rows")
+split.add_title(f"Europe lives {continent_mean['Europe'] - continent_mean['Africa']:.0f} years longer than Africa")
 split.add_layout(
     Row(
         [
@@ -123,7 +138,7 @@ split.add_layout(
                 5,
                 [
                     Row([tag("Row(chart)"), bars]),
-                    Row([tag("Row(text)"), "<p>Europe lives 23 years longer than Africa on average.</p>"]),
+                    Row([tag("Row(text)"), f"<p>Mean of the countries of each continent, {last_year}.</p>"]),
                 ],
                 font_size="70%",
             ),
@@ -140,7 +155,7 @@ split.add_layout(
 # itself split into two columns.
 
 nested = Slide()
-nested.add_title("Three levels of nesting")
+nested.add_title(f"Oceania and Europe live longest, Africa {continent_mean['Africa']:.0f} years")
 nested.add_layout(
     Row(
         [
@@ -151,8 +166,8 @@ nested.add_layout(
                     Row([tag("Row(chart)"), bars]),
                     Row(
                         [
-                            Column(6, [tag("Column(6)"), figure("77.6", "Europe")]),
-                            Column(6, [tag("Column(6)"), figure("54.8", "Africa")]),
+                            Column(6, [tag("Column(6)"), figure(f"{continent_mean['Europe']:.1f}", "Europe")]),
+                            Column(6, [tag("Column(6)"), figure(f"{continent_mean['Africa']:.1f}", "Africa")]),
                         ],
                         gap=2,
                     ),

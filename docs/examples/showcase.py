@@ -1,7 +1,7 @@
 """The respysive-slide showcase.
 
 One deck that goes through the main features: title page, Markdown,
-fragments, Plotly, Altair and Matplotlib charts, a table, an equation, cards,
+fragments, Plotly, Altair, and Matplotlib charts, a table, an equation, cards,
 nested layouts, a mappyng map, and a web map. It opens the documentation, is published as
 ``showcase.html`` next to it, and gives the picture of the README.
 
@@ -98,9 +98,9 @@ intro.add_content(
         markdown(
             """
 - Text in **Markdown** or HTML, equations in LaTeX
-- **Plotly**, **Altair** and **Matplotlib** charts, passed as they are
-- Tables, images, videos, cards and web maps
-- A Bootstrap grid of 12 columns, rows and columns nested at will
+- **Plotly**, **Altair**, and **Matplotlib** charts, passed as they are
+- Tables, images, videos, cards, and maps
+- A Bootstrap grid of 12 columns, with nested rows and columns
 - Export to **PDF** and **PowerPoint**, or to a file that works offline
 """
         )
@@ -123,6 +123,7 @@ bubbles = px.scatter(
 )
 bubbles.update_layout(height=500, margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.1))
 
+longest, shortest = latest.nlargest(1, "lifeExp").iloc[0], latest.nsmallest(1, "lifeExp").iloc[0]
 plotly_slide = Slide()
 plotly_slide.add_title("Richer countries live longer")
 plotly_slide.add_content(
@@ -130,7 +131,8 @@ plotly_slide.add_content(
         bubbles,
         markdown(
             "Each bubble is a country, sized by its population.\n\n"
-            "**Japan** leads with 82.6 years, **Swaziland** comes last with 39.6.\n\n"
+            f"**{longest.country}** leads with {longest.lifeExp:.1f} years, "
+            f"**{shortest.country}** comes last with {shortest.lifeExp:.1f}.\n\n"
             "Hover a bubble to read its values."
         ),
     ],
@@ -149,14 +151,14 @@ altair_chart = (
         color=alt.Color("country:N", title=None),
         tooltip=["country", "year", "lifeExp"],
     )
-    .properties(width=470, height=380, title="Altair: five countries")
+    .properties(width=470, height=380, title="Five countries")
 )
 
 means = gapminder.groupby(["year", "continent"])["lifeExp"].mean().unstack()
 mpl_fig, ax = plt.subplots(figsize=(6.2, 4.6))
 for colour, continent in zip(COLORS, means.columns, strict=False):
     ax.plot(means.index, means[continent], color=colour, linewidth=2.5, label=continent)
-ax.set_title("Matplotlib: mean by continent", loc="left")
+ax.set_title("Mean of the countries of each continent", loc="left")
 ax.set_ylabel("Life expectancy (years)")
 ax.spines[["top", "right"]].set_visible(False)
 ax.grid(axis="y", alpha=0.3)
@@ -164,7 +166,8 @@ ax.legend(frameon=False, fontsize=9)
 mpl_fig.tight_layout()
 
 charts_slide = Slide()
-charts_slide.add_title("Three chart libraries, one deck")
+gains = means.iloc[-1] - means.iloc[0]
+charts_slide.add_title(f"Asia gained {gains['Asia']:.0f} years of life, and Japan overtook France")
 charts_slide.add_content([altair_chart, mpl_fig], columns=[6, 6])
 plt.close(mpl_fig)
 
@@ -175,7 +178,10 @@ table = extremes[["libgeo", "taux_mortalite"]].rename(columns={"libgeo": "Depart
 table = table.round(1).to_html(index=False, border=0)
 
 table_slide = Slide()
-table_slide.add_title("Tables and equations")
+table_slide.add_title(
+    f"Heart failure deaths range from {rates['taux_mortalite'].min():.0f} to "
+    f"{rates['taux_mortalite'].max():.0f} per 100,000 across departments"
+)
 table_slide.add_content(
     [
         table,
@@ -198,12 +204,22 @@ trend.update_layout(height=230, margin=dict(l=10, r=10, t=10, b=10), paper_bgcol
 
 BIG = {"font-size": "150%", "color": "#1d4ed8"}
 cards = Slide()
-cards.add_title("Cards")
+gain = end["lifeExp"] - start["lifeExp"]
+cards.add_title(f"World life expectancy rose by {gain:.0f} years in half a century")
 cards.add_card(
     [
-        {"title": "+20 years", "title_style": BIG, "text": "World life expectancy, from 49 in 1952 to 69 in 2007."},
+        {
+            "title": f"+{gain:.0f} years",
+            "title_style": BIG,
+            "text": f"World life expectancy, from {start['lifeExp']:.0f} in {start['year']:.0f} "
+            f"to {end['lifeExp']:.0f} in {end['year']:.0f}.",
+        },
         {"title": "World average, weighted by population", "graph": trend},
-        {"title": "142", "title_style": BIG, "text": "Countries followed every five years by Gapminder."},
+        {
+            "title": str(gapminder["country"].nunique()),
+            "title_style": BIG,
+            "text": "Countries followed every five years by Gapminder.",
+        },
     ],
     styles=[{"class": "bg-light"}, {"class": "bg-light"}, {"class": "bg-light"}],
     fragment=True,
@@ -222,8 +238,9 @@ bars = px.bar(
 bars.update_traces(texttemplate="%{text:.1f}", textposition="inside")
 bars.update_layout(height=440, margin=dict(l=10, r=10, t=10, b=10))
 
+mean = by_continent.set_index("continent")["lifeExp"]
 layout_slide = Slide()
-layout_slide.add_title("Nested layouts")
+layout_slide.add_title(f"Oceania lives {mean['Oceania'] - mean['Africa']:.0f} years longer than Africa")
 layout_slide.add_layout(
     Row(
         [
@@ -231,9 +248,9 @@ layout_slide.add_layout(
             Column(
                 4,
                 [
-                    Row(key_figure("80.7", "years in Oceania")),
-                    Row(key_figure("54.8", "years in Africa")),
-                    Row(key_figure("25.9", "years between them")),
+                    Row(key_figure(f"{mean['Oceania']:.1f}", "years in Oceania")),
+                    Row(key_figure(f"{mean['Africa']:.1f}", "years in Africa")),
+                    Row(key_figure(f"{mean['Oceania'] - mean['Africa']:.1f}", "years between them")),
                 ],
             ),
         ],
@@ -270,7 +287,7 @@ france = (
         border_radius=6,
         box_shadow=True,
     )
-    # Lighter water along the coasts, meridians and parallels under the land
+    # Lighter water along the coasts, then the meridians and parallels under the land
     + mp.OceanGradient(europe)
     + mp.Graticule(step=2, stroke="#ffffff", opacity=0.9, stroke_width=0.7)
     # European countries as background, France lifted by a drop shadow
@@ -289,7 +306,6 @@ france = (
             "Deaths / 100,000 inhabitants",
             orientation="horizontal",
             decimals=0,
-            label_rotation=0,
             nodata_label="No data",
             swatch_shape="rounded",
         ),
@@ -301,14 +317,16 @@ france = (
 )
 
 choropleth = Slide()
-choropleth.add_title("Thematic maps: heart failure in France")
+low, high = rates.nsmallest(1, "taux_mortalite").iloc[0], rates.nlargest(1, "taux_mortalite").iloc[0]
+choropleth.add_title("Heart failure deaths are lowest in the Paris area")
 choropleth.add_content(
     [
         france.to_interactive(),
         markdown(
             "Drawn in Python with [mappyng](https://fbxyz.github.io/mappyng/): an SVG that works "
             "offline and stays sharp in PDF.\n\n"
-            "Lowest in the Paris area, **25** per 100,000 in Val-de-Marne, highest in Creuse, **71**."
+            f"**{low.taux_mortalite:.0f}** per 100,000 in {low.libgeo}, "
+            f"**{high.taux_mortalite:.0f}** in {high.libgeo}, the highest."
         ),
     ],
     columns=[8, 4],
@@ -318,8 +336,9 @@ choropleth.add_notes("Hover a department to read its rate.")
 
 # Proportional circles, with a vertical slide below
 traffic = pd.read_csv(DATA / "paris_africa_air_traffic.csv")
+busiest = traffic.nlargest(2, "passengers_2024")["city"].tolist()
 circles = Slide()
-circles.add_title("Air passengers between Paris and Africa, 2024")
+circles.add_title(f"{busiest[0]} and {busiest[1]} lead air traffic between Paris and Africa, 2024")
 circles.add_maplibre_circles_map(
     center=[8, 18],
     zoom=2,
@@ -341,12 +360,20 @@ circles.add_content(
     styles=[{"font-size": "60%", "text-align": "center", "color": "#6b7280", "margin-top": "12px"}],
 )
 
-below = Slide(center=True)
-below.add_title("A vertical slide", tag="h2")
+below = Slide()
+below.add_title("Data sources")
 below.add_content(
-    [markdown("Slides grouped in a list are stacked: the down arrow reaches them, Esc shows the overview.")],
-    styles=[{"text-align": "center"}],
+    [
+        markdown(
+            "- Life expectancy, income, and population: Gapminder, every five years from 1952 to 2007\n"
+            "- Heart failure mortality: Sante publique France (ODISSE), standardised rates, 2020-2022\n"
+            "- Air passengers: Eurostat (avia_par_fr), 2024\n"
+            "- Departments and European countries: IGN (GéoFLA), through mappyng"
+        )
+    ],
+    styles=[{"font-size": "80%"}],
 )
+below.add_notes("This slide sits below the map: the down arrow reaches it, Esc shows the overview.")
 
 # Closing slide: the code that wrote this deck
 closing = Slide(center=True, **{"data-background-gradient": "linear-gradient(135deg, #1e3a8a, #2563eb)"})
