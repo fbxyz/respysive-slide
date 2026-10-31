@@ -87,8 +87,12 @@ When several charts use the same one, it is stored once in the deck:
    deck.add_global_geojson("counties", counties_geojson)
    slide.add_content([fig_2019, fig_2020], columns=[6, 6], shared_data_ids=["counties", "counties"])
 
-The charts then read the shared copy when the slide is drawn. This works
-for the ``choropleth``, ``choroplethmap``, and ``scattermap`` trace types.
+The figures can be built with their GeoJSON as usual: respysive leaves it
+out of the page, and the charts read the shared copy when the slide is
+drawn. Saving the deck raises an error if the id was never added. This
+works for the traces placed by ``locations``, such as ``choropleth`` and
+``choroplethmap``. :ref:`sphx_glr_gallery_plot_09_shared_geojson.py`
+shares one GeoJSON between Plotly and MapLibre.
 
 Charts in cards
 ---------------

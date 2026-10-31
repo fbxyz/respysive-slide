@@ -30,6 +30,21 @@ def _uses_tile_maps(plotly_data):
         return False
 
 
+def _figure_without_geojson(plotly_data):
+    """Plotly figure as a dict whose traces leave their GeoJSON to the shared copy."""
+    if hasattr(plotly_data, "to_json"):
+        figure = json.loads(plotly_data.to_json())
+    elif isinstance(plotly_data, str):
+        figure = json.loads(plotly_data)
+    else:
+        figure = dict(plotly_data)
+    figure["data"] = [
+        {k: v for k, v in trace.items() if k != "geojson"} if isinstance(trace, dict) else trace
+        for trace in figure.get("data", [])
+    ]
+    return figure
+
+
 class Content:
     """Content container for slide elements and data management.
 
@@ -40,13 +55,13 @@ class Content:
         """Initialize an empty content container."""
         self.content = ""
         self.shared_data = {}
-        self.geojson_refs = set()  # deck GeoJSON ids used by MapLibre maps
+        self.geojson_refs = set()  # deck GeoJSON ids used by MapLibre maps and Plotly charts
 
     def clear(self):
         """Reset all content and shared data."""
         self.content = ""
         self.shared_data = {}
-        self.geojson_refs = set()  # deck GeoJSON ids used by MapLibre maps
+        self.geojson_refs = set()  # deck GeoJSON ids used by MapLibre maps and Plotly charts
 
     def add_shared_data(self, data_id: str, data, data_type: str = "json"):
         """Store shared data (JSON/GeoJSON) that can be referenced by multiple charts.
@@ -372,7 +387,7 @@ class Content:
         if shared_data_id:
             use_local_data = shared_data_id in self.shared_data
 
-            plotly_data_json = json.dumps(plotly_data) if plotly_data else "null"
+            plotly_data_json = json.dumps(_figure_without_geojson(plotly_data)) if plotly_data else "null"
 
             data_element_id = f"shared-data-{shared_data_id}" if use_local_data else shared_data_id
 
@@ -403,9 +418,10 @@ class Content:
                     var plotlyConfig = {plotly_data_json};
                     if (plotlyConfig && typeof plotlyConfig === 'object') {{
                         figure = plotlyConfig;
-                        // If shared data contains GeoJSON features, add them
+                        // Traces placed by location read the shared GeoJSON
                         if (sharedData.features && figure.data && figure.data.length > 0) {{
-                            figure.data[0].geojson = sharedData;
+                            var placed = figure.data.filter(function(t) {{ return t.locations && !t.geojson; }});
+                            (placed.length ? placed : [figure.data[0]]).forEach(function(t) {{ t.geojson = sharedData; }});
                         }}
                     }} else {{
                         // Use only shared data

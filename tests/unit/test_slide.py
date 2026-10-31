@@ -14,6 +14,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 import matplotlib.pyplot as plt
+import pytest
 
 from respysive.container import Slide
 
@@ -145,6 +146,31 @@ class TestSlideContent(unittest.TestCase):
         # This should not raise an error
         self.slide.add_content(content, shared_data_ids=shared_data_ids)
         self.assertIn("Test content", self.slide.content)
+
+    def test_shared_geojson_with_plotly_figure(self):
+        """A Plotly figure takes a shared GeoJSON and leaves its own copy out of the page."""
+        go = pytest.importorskip("plotly.graph_objects")
+        geojson = {"type": "FeatureCollection", "features": [{"type": "Feature", "id": "A", "geometry": None}]}
+        marker = "UNIQUE_SHAPE_NAME"
+        geojson["features"][0]["properties"] = {"name": marker}
+        fig = go.Figure(go.Choroplethmap(geojson=geojson, locations=["A"], z=[1]))
+
+        self.slide.add_content([fig], shared_data_ids=["deps"])
+        self.assertIn("getElementById('deps')", self.slide.content)
+        self.assertNotIn(marker, self.slide.content)
+
+    def test_shared_geojson_missing_from_deck(self):
+        """Saving a deck whose Plotly chart reads GeoJSON that was never added raises."""
+        go = pytest.importorskip("plotly.graph_objects")
+        from respysive import Presentation
+
+        self.slide.add_content([go.Figure(go.Choroplethmap(locations=["A"], z=[1]))], shared_data_ids=["deps"])
+        deck = Presentation()
+        deck.add_slide([self.slide])
+        with self.assertRaisesRegex(ValueError, "'deps'"):
+            deck.to_html()
+        deck.add_global_geojson("deps", {"type": "FeatureCollection", "features": []})
+        self.assertIn('id="deps"', deck.to_html())
 
 
 class TestSlideCards(unittest.TestCase):

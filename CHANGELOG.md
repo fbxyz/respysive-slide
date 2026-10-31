@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.2
+
+- `shared_data_ids` accepts Plotly figures, not only dicts, and leaves their
+  GeoJSON out of the page: the charts read the copy stored once with
+  `add_global_geojson`, on every trace placed by `locations`.
+- Saving a deck raises an error when a Plotly chart reads a shared GeoJSON
+  that was never added, as for MapLibre maps, instead of printing a message.
+- The mappyng map of the documentation and of the showcase draws the European
+  countries in the background, the overseas departments in insets, and
+  contrasted borders.
+- New gallery example: one GeoJSON shared by mappyng, Plotly, and MapLibre maps.
+
 ## 2.0.1
 
 - mappyng is published on PyPI as `mappyng-svg`: the documentation, the gallery

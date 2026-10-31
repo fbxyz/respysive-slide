@@ -12,32 +12,56 @@ mappyng
 mappyng draws thematic maps (choropleth, proportional symbols, labels,
 insets) from GeoDataFrames. A ``Map`` is passed to ``add_content`` as it
 is, and ``to_interactive()`` adds the tooltips declared with
-``mp.Tooltip``. mappyng is installed with ``pip install mappyng-svg``
+``mp.Tooltip``. The map below draws the European countries in the
+background, lifts France with a drop shadow, puts the overseas departments
+in insets, and ``border_contrast=True`` redraws the borders between
+neighbours of similar colour. mappyng is installed with ``pip install mappyng-svg``
 (`documentation <https://fbxyz.github.io/mappyng/>`_).
 
 .. respysive-demo::
 
    import pandas as pd
    import mappyng as mp
-   from mappyng.data import load_france_departments
+   from mappyng.data import load_europe, load_france_departments, load_france_regions
    from respysive import Presentation, Slide
 
+   europe = load_europe().to_crs(2154)
+   regions = load_france_regions().to_crs(2154)
    rates = pd.read_csv("data/cardio_mortalite_dep.csv", dtype={"code_dep": str})
-   deps = load_france_departments().to_crs(2154).merge(rates, left_on="COD_GEO", right_on="code_dep")
+   deps = load_france_departments().to_crs(2154).merge(rates, left_on="COD_GEO", right_on="code_dep", how="left")
+   overseas = {
+       "Guadeloupe": [-6890454, 1780151, -6799589, 1874186],
+       "Martinique": [-6826862, 1609607, -6759494, 1685367],
+       "French Guiana": [-6136680, 235261, -5707791, 671780],
+       "Reunion": [6136383, -2448160, 6226316, -2366992],
+       "Mayotte": [5006226, -1459183, 5050208, -1416184],
+   }
 
    m = (
-       mp.Map(deps, bbox=[90000, 6040000, 1280000, 7150000], width=600, height=560)
-       + mp.Choropleth(deps, column="taux_mortalite", cmap="YlOrRd", method="Quantiles", num_classes=5,
-                       stroke="#ffffff", stroke_width=0.3, legend=mp.Legend("Deaths per 100,000", decimals=0))
+       mp.Map(europe, bbox=[90000, 6040000, 1280000, 7150000], width=900, height=760, padding=20,
+              facecolor="#B9D9EB", border_radius=10, box_shadow={"dx": 3, "dy": 3, "blur": 6, "opacity": 0.2})
+       + mp.Insets([mp.Inset(name, bbox=bbox, crs=3857) for name, bbox in overseas.items()],
+                   spacing=15, title_size=7, border_radius=6, box_shadow=True)
+       + mp.OceanGradient(europe)
+       + mp.Graticule(step=2, stroke="#ffffff", opacity=0.9, stroke_width=0.7)
+       + mp.Basemap()
+       + mp.DropShadow(europe, query="code_pays_iso3 == 'FRA'")
+       + mp.Choropleth(deps, column="taux_mortalite", cmap="Reds", method="Quantiles", num_classes=5,
+                       stroke="#ffffff", stroke_width=0.3, border_contrast=True,
+                       legend=mp.Legend("Deaths / 100,000 inhabitants", orientation="horizontal", decimals=0,
+                                        label_rotation=0, nodata_label="No data", swatch_shape="rounded"))
+       + mp.Vector(regions, stroke="#333333", stroke_width=0.4, position="top")
+       + mp.ScaleBar(length=100000, label="100 km", position=(0.55, 0.855), opacity=0.8)
+       + mp.Source("Source: Sante publique France (ODISSE)")
        + mp.Tooltip(["libgeo", "taux_mortalite"], aliases={"libgeo": "Department", "taux_mortalite": "Rate"})
    )
 
    slide = Slide()
    slide.add_title("Mortality from heart failure, 2020-2022")
    slide.add_content(
-       [m.to_interactive(), "Lowest in the Paris area (25 per 100,000 in Val-de-Marne), highest in Creuse (71)."],
-       columns=[7, 5],
-       styles=[None, {"font-size": "75%", "align-self": "center"}],
+       [m.to_interactive(), "Lowest in the Paris area, 25 per 100,000 in Val-de-Marne, highest in Creuse, 71."],
+       columns=[8, 4],
+       styles=[None, {"align-self": "center"}],
    )
 
    deck = Presentation()
@@ -132,6 +156,9 @@ gives the colour. The popup template reads the GeoJSON properties.
 When the same polygons appear on several slides with different values,
 store the GeoJSON once with ``add_global_geojson`` and join the values on
 each slide with ``add_maplibre_choropleth_with_data_join``.
+:ref:`sphx_glr_gallery_plot_09_shared_geojson.py` draws the same
+departments with mappyng, Plotly, and MapLibre, with one GeoJSON stored in
+the deck for the two web maps.
 
 Maps in exports
 ---------------

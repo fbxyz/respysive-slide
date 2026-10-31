@@ -15,7 +15,7 @@ from pathlib import Path
 
 import mappyng as mp
 import pandas as pd
-from mappyng.data import load_france_departments
+from mappyng.data import load_europe, load_france_departments, load_france_regions
 
 from respysive import Presentation, Slide
 
@@ -32,22 +32,67 @@ DATA = Path("data")
 # -----------------------------
 #
 # A mappyng ``Map`` is passed to ``add_content`` as it is. ``to_interactive()``
-# adds the tooltips declared with ``mp.Tooltip``.
+# adds the tooltips declared with ``mp.Tooltip``. The European countries are
+# drawn in the background, the overseas departments in insets, and
+# ``border_contrast=True`` redraws the borders between neighbours of similar
+# colour.
 
 rates = pd.read_csv(DATA / "cardio_mortalite_dep.csv", dtype={"code_dep": str})
-deps = load_france_departments().to_crs(2154).merge(rates, left_on="COD_GEO", right_on="code_dep")
+europe = load_europe().to_crs(2154)
+regions = load_france_regions().to_crs(2154)
+deps = load_france_departments().to_crs(2154).merge(rates, left_on="COD_GEO", right_on="code_dep", how="left")
+OVERSEAS = {
+    "Guadeloupe": [-6890454, 1780151, -6799589, 1874186],
+    "Martinique": [-6826862, 1609607, -6759494, 1685367],
+    "French Guiana": [-6136680, 235261, -5707791, 671780],
+    "Reunion": [6136383, -2448160, 6226316, -2366992],
+    "Mayotte": [5006226, -1459183, 5050208, -1416184],
+}
 svg_map = (
-    mp.Map(deps, bbox=[90000, 6040000, 1280000, 7150000], width=600, height=560)
+    mp.Map(
+        europe,
+        bbox=[90000, 6040000, 1280000, 7150000],
+        width=900,
+        height=760,
+        padding=20,
+        facecolor="#B9D9EB",
+        border_radius=10,
+        box_shadow={"dx": 3, "dy": 3, "blur": 6, "opacity": 0.2},
+    )
+    + mp.Insets(
+        [mp.Inset(name, bbox=bbox, crs=3857) for name, bbox in OVERSEAS.items()],
+        spacing=15,
+        title_size=7,
+        border_radius=6,
+        box_shadow=True,
+    )
+    # Lighter water along the coasts, meridians and parallels under the land
+    + mp.OceanGradient(europe)
+    + mp.Graticule(step=2, stroke="#ffffff", opacity=0.9, stroke_width=0.7)
+    # European countries as background, France lifted by a drop shadow
+    + mp.Basemap()
+    + mp.DropShadow(europe, query="code_pays_iso3 == 'FRA'")
     + mp.Choropleth(
         deps,
         column="taux_mortalite",
-        cmap="YlOrRd",
+        cmap="Reds",
         method="Quantiles",
         num_classes=5,
         stroke="#ffffff",
         stroke_width=0.3,
-        legend=mp.Legend("Deaths per 100,000", decimals=0),
+        border_contrast=True,
+        legend=mp.Legend(
+            "Deaths / 100,000 inhabitants",
+            orientation="horizontal",
+            decimals=0,
+            label_rotation=0,
+            nodata_label="No data",
+            swatch_shape="rounded",
+        ),
     )
+    + mp.Vector(regions, stroke="#333333", stroke_width=0.4, position="top")
+    + mp.ScaleBar(length=100000, label="100 km", position=(0.55, 0.855), opacity=0.8)
+    + mp.Source("Source: Sante publique France (ODISSE)")
     + mp.Tooltip(["libgeo", "taux_mortalite"], aliases={"libgeo": "Department", "taux_mortalite": "Rate"})
 )
 
@@ -55,7 +100,7 @@ svg_slide = Slide()
 svg_slide.add_title("Mortality from heart failure, 2020-2022")
 svg_slide.add_content(
     [svg_map.to_interactive(), "Lowest in the Paris area, highest in Creuse."],
-    columns=[7, 5],
+    columns=[8, 4],
     styles=[None, {"align-self": "center"}],
 )
 

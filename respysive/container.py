@@ -131,13 +131,13 @@ class Slide:
         return None
 
     def _ensure_shared_data_available(self, shared_data_id: str):
-        """Ensure shared data availability by copying from global data if needed.
+        """Record a shared data id that the deck must provide.
 
         Args:
             shared_data_id: ID of the shared data to ensure availability
         """
         if shared_data_id not in self.content_obj.shared_data:
-            print(f"Info: Shared data '{shared_data_id}' will be resolved from global presentation data")
+            self.content_obj.geojson_refs.add(shared_data_id)  # checked by Presentation when saving
 
     def _process_content_with_handlers(self, content, shared_data_id=None, content_type=None, **kwargs):
         """Process content using the handler system.
