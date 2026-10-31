@@ -2,9 +2,9 @@
 Maps
 ====
 
-MapLibre web maps, with tiles, zoom, and pan, which need a network
-connection while the deck is shown. Maps drawn in Python with mappyng
-will be added here once mappyng 2 is published.
+Thematic maps drawn in Python with mappyng, which are SVG and work
+offline, and MapLibre web maps, with tiles, zoom, and pan, which need a
+network connection while the deck is shown.
 
 Data: mortality from heart failure by department (Sante publique France)
 and air passengers between Paris and African cities in 2024 (Eurostat).
@@ -13,7 +13,9 @@ and air passengers between Paris and African cities in 2024 (Eurostat).
 import json
 from pathlib import Path
 
+import mappyng as mp
 import pandas as pd
+from mappyng.data import load_france_departments
 
 from respysive import Presentation, Slide
 
@@ -26,13 +28,45 @@ STYLE = """
 DATA = Path("data")
 
 # %%
+# A choropleth map with mappyng
+# -----------------------------
+#
+# A mappyng ``Map`` is passed to ``add_content`` as it is. ``to_interactive()``
+# adds the tooltips declared with ``mp.Tooltip``.
+
+rates = pd.read_csv(DATA / "cardio_mortalite_dep.csv", dtype={"code_dep": str})
+deps = load_france_departments().to_crs(2154).merge(rates, left_on="COD_GEO", right_on="code_dep")
+svg_map = (
+    mp.Map(deps, bbox=[90000, 6040000, 1280000, 7150000], width=600, height=560)
+    + mp.Choropleth(
+        deps,
+        column="taux_mortalite",
+        cmap="YlOrRd",
+        method="Quantiles",
+        num_classes=5,
+        stroke="#ffffff",
+        stroke_width=0.3,
+        legend=mp.Legend("Deaths per 100,000", decimals=0),
+    )
+    + mp.Tooltip(["libgeo", "taux_mortalite"], aliases={"libgeo": "Department", "taux_mortalite": "Rate"})
+)
+
+svg_slide = Slide()
+svg_slide.add_title("Mortality from heart failure, 2020-2022")
+svg_slide.add_content(
+    [svg_map.to_interactive(), "Lowest in the Paris area, highest in Creuse."],
+    columns=[7, 5],
+    styles=[None, {"align-self": "center"}],
+)
+
+# %%
 # A choropleth map with MapLibre
 # -------------------------------
 #
 # ``color_rules`` are tested in order and the first match gives the colour
 # of each department. The popup template reads the GeoJSON properties.
 
-rates = pd.read_csv(DATA / "cardio_mortalite_dep.csv", dtype={"code_dep": str}).set_index("code_dep")
+rates = rates.set_index("code_dep")
 geojson = json.loads((DATA / "france_departments.geojson").read_text())
 geojson["features"] = [f for f in geojson["features"] if f["properties"]["code_dep"] in rates.index]
 for feature in geojson["features"]:
@@ -85,5 +119,5 @@ web_map.add_maplibre_circles_map(
 
 deck = Presentation()
 deck.add_custom_css(STYLE)
-deck.add_slide([map_slide, web_map])
+deck.add_slide([svg_slide, map_slide, web_map])
 deck.save_html("maps.html", theme="white")

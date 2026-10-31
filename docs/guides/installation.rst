@@ -29,8 +29,14 @@ Playwright. PowerPoint also needs ``python-pptx``.
 Without Chromium, ``save_pdf`` and ``save_pptx`` stop with an error that
 gives these two commands.
 
-Maps drawn with mappyng need that package. mappyng 2, the version
-respysive works with, will be published soon. MapLibre maps need nothing more than a network connection when
+Maps drawn with `mappyng <https://fbxyz.github.io/mappyng/>`_ need that
+package:
+
+.. code-block:: bash
+
+   pip install mappyng-svg
+
+MapLibre maps need nothing more than a network connection when
 the deck is shown.
 
 Development version

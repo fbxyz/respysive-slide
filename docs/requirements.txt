@@ -9,3 +9,4 @@ matplotlib
 plotly
 altair
 pandas
+mappyng-svg>=1.0

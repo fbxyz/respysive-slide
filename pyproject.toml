@@ -14,7 +14,7 @@ readme = "README.md"
 version = "2.0.0"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
-keywords = ["slide", "presentation", "Bootstrap", "plotly", "altair", "pandas"]
+keywords = ["slide", "presentation", "Bootstrap", "plotly", "altair", "pandas", "mappyng-svg>=1.0"]
 requires-python = ">=3.10"
 
 [tool.flit.module]
@@ -34,6 +34,7 @@ dev = [
     "ruff",
     "pre-commit",
 ]
+maps = ["mappyng-svg>=1.0"]
 pdf = ["playwright"]
 pptx = ["playwright", "python-pptx"]
 docs = ["sphinx>=7", "furo", "sphinx-gallery>=0.16", "sphinx-copybutton", "sphinx-autodoc-typehints", "playwright", "markdown", "matplotlib", "plotly", "altair", "pandas"]

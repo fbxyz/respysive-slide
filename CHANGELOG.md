@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.1
+
+- mappyng is published on PyPI as `mappyng-svg`: the documentation, the gallery
+  and the showcase deck now draw a mappyng map, and `pip install
+  "respysive-slide[maps]"` installs it.
+- Two old mappyng examples that read files from a local path are removed.
+
 ## 2.0.0
 
 Version 2 replaces Reveal.js with its own slide runtime. Scripts written for

@@ -2,22 +2,23 @@
 
 One deck that goes through the main features: title page, Markdown,
 fragments, Plotly, Altair and Matplotlib charts, a table, an equation, cards,
-nested layouts, and web maps. It opens the documentation, is published as
+nested layouts, a mappyng map, and a web map. It opens the documentation, is published as
 ``showcase.html`` next to it, and gives the picture of the README.
 
 Run from this directory: ``python showcase.py`` writes ``showcase.html``.
 """
 
-import json
 from pathlib import Path
 
 import altair as alt
 import matplotlib
 
 matplotlib.use("Agg")
+import mappyng as mp
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
+from mappyng.data import load_france_departments
 from markdown import markdown
 
 from respysive import Column, Presentation, Row, Slide, palette
@@ -240,43 +241,39 @@ layout_slide.add_layout(
     )
 )
 
-# A choropleth web map
-geojson = json.loads((DATA / "france_departments.geojson").read_text())
-rates = rates.set_index("code_dep")
-geojson["features"] = [f for f in geojson["features"] if f["properties"]["code_dep"] in rates.index]
-for feature in geojson["features"]:
-    feature["properties"].update(rates.loc[feature["properties"]["code_dep"]].to_dict())
+# A thematic map drawn in Python with mappyng
+deps = load_france_departments().to_crs(2154).merge(rates, left_on="COD_GEO", right_on="code_dep")
+france = (
+    mp.Map(deps, bbox=[90000, 6040000, 1280000, 7150000], width=600, height=560)
+    + mp.Choropleth(
+        deps,
+        column="taux_mortalite",
+        cmap="YlOrRd",
+        method="Quantiles",
+        num_classes=5,
+        stroke="#ffffff",
+        stroke_width=0.3,
+        legend=mp.Legend("Deaths per 100,000", decimals=0),
+    )
+    + mp.Tooltip(["libgeo", "taux_mortalite"], aliases={"libgeo": "Department", "taux_mortalite": "Rate"})
+)
 
 choropleth = Slide()
-choropleth.add_title("Web maps: heart failure in France")
-choropleth.add_maplibre_choropleth_map(
-    center=[2.5, 46.6],
-    zoom=4,
-    geojson=geojson,
-    color_property="taux_mortalite",
-    color_rules=[
-        {"operator": ">=", "value": 55, "color": "#b91c1c"},
-        {"operator": ">=", "value": 45, "color": "#f97316"},
-        {"operator": "<", "value": 45, "color": "#fde68a"},
-    ],
-    popup="<b>{libgeo}</b><br>{taux_mortalite} per 100,000",
-    legend={
-        "title": "Deaths per 100,000",
-        "choropleth": {
-            "type": "discrete",
-            "items": [
-                {"color": "#b91c1c", "label": "55 or more"},
-                {"color": "#f97316", "label": "45 to 55"},
-                {"color": "#fde68a", "label": "Less than 45"},
-            ],
-        },
-    },
-)
+choropleth.add_title("Thematic maps: heart failure in France")
 choropleth.add_content(
-    ["Click a department to read its rate. Source: Sante publique France, 2020-2022."],
-    styles=[{"font-size": "60%", "text-align": "center", "color": "#6b7280", "margin-top": "12px"}],
+    [
+        france.to_interactive(),
+        markdown(
+            "Drawn in Python with [mappyng](https://fbxyz.github.io/mappyng/): an SVG that works "
+            "offline and stays sharp in PDF.\n\n"
+            "Lowest in the Paris area, **25** per 100,000 in Val-de-Marne, highest in Creuse, **71**."
+        )
+        + '<p style="font-size:60%;color:#6b7280;">Source: Sante publique France, 2020-2022.</p>',
+    ],
+    columns=[7, 5],
+    styles=[None, {"align-self": "center"}],
 )
-choropleth.add_notes("Click a department to read its rate.")
+choropleth.add_notes("Hover a department to read its rate.")
 
 # Proportional circles, with a vertical slide below
 traffic = pd.read_csv(DATA / "paris_africa_air_traffic.csv")

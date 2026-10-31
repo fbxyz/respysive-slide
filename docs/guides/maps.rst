@@ -9,17 +9,13 @@ needs a network connection while the deck is shown.
 mappyng
 -------
 
-.. note::
-
-   mappyng 2, the version respysive works with, will be published soon.
-   The example below is shown without its deck until then.
-
 mappyng draws thematic maps (choropleth, proportional symbols, labels,
 insets) from GeoDataFrames. A ``Map`` is passed to ``add_content`` as it
 is, and ``to_interactive()`` adds the tooltips declared with
-``mp.Tooltip``.
+``mp.Tooltip``. mappyng is installed with ``pip install mappyng-svg``
+(`documentation <https://fbxyz.github.io/mappyng/>`_).
 
-.. code-block:: python
+.. respysive-demo::
 
    import pandas as pd
    import mappyng as mp

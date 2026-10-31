@@ -66,8 +66,8 @@ opens the speaker view.
   images, videos, Plotly, Altair, Matplotlib, pandas tables) and places the items
   side by side. Cards, title pages, and nested layouts with `Row` and `Column`.
 - **Maps**: MapLibre web maps (markers, proportional circles, flows, choropleths)
-  without writing JavaScript. Thematic maps drawn in Python with mappyng are also
-  supported; mappyng 2 will be published soon.
+  without writing JavaScript, and thematic SVG maps drawn in Python with
+  [mappyng](https://fbxyz.github.io/mappyng/) (`pip install mappyng-svg`).
 - **Presenting**: fragments, vertical slides, speaker view with notes, overview,
   touch navigation.
 - **Fitting**: slides have a fixed size, and content taller than the slide is

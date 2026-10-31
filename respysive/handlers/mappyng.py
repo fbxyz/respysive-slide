@@ -8,7 +8,7 @@ from .base import BaseHandler
 class MappyngHandler(BaseHandler):
     """Handler for mappyng ``Map`` and ``InteractiveMap`` objects.
 
-    mappyng (https://codeberg.org/fbxyz/mappyng) is an SVG-native
+    mappyng (https://github.com/fbxyz/mappyng) is an SVG-native
     cartographic library. Two object types are supported:
 
     - ``mappyng.interactive.InteractiveMap``: produced by
