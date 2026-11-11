@@ -32,16 +32,17 @@ class ImageHandler(BaseHandler):
         if not isinstance(content, str):
             return False
 
-        img_extensions = [".jpg", ".jpeg", ".png", ".gif", ".tif", ".apng", ".bmp", ".svg", ".avif", ".webp"]
+        img_extensions = [".jpg", ".jpeg", ".png", ".gif", ".tif", ".tiff", ".apng", ".bmp", ".svg", ".avif", ".webp"]
 
         if os.path.isfile(content):
             return os.path.splitext(content)[1].lower() in img_extensions
 
-        if re.match(
+        # a URL holds no whitespace: a sentence naming a file is text
+        if not re.search(r"\s", content.strip()) and re.match(
             r"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)",
             content,
         ):
-            return re.search(r"\.(jpg|jpeg|png|gif|tif|apng|bmp|svg|avif|webp)", content, re.IGNORECASE) is not None
+            return re.search(r"\.(jpg|jpeg|png|gif|tiff?|apng|bmp|svg|avif|webp)\b", content, re.IGNORECASE) is not None
 
         return False
 
@@ -60,7 +61,7 @@ class ImageHandler(BaseHandler):
         Raises:
             ValueError: If content is not a valid image path or URL.
         """
-        if not isinstance(content, str) or not self.can_handle(content):
+        if not isinstance(content, str) or not (forced or self.can_handle(content)):
             raise ValueError("Content must be a valid image file path or URL")
 
         center_style = {"class": ["d-flex", "justify-content-center", "mx-auto"]}

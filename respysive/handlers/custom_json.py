@@ -1,6 +1,7 @@
 """Custom JSON configuration handler for external JavaScript libraries."""
 
 import json
+import re
 import uuid
 from typing import Any
 
@@ -74,7 +75,7 @@ class CustomJsonHandler(BaseHandler):
 
         library = content["library"]
         cdn_config = content.get("cdn", {})
-        config = content["config"]
+        config = dict(content["config"])  # the caller may reuse its config for another chart
         init_script = content.get("init_script", "")
         div_style = content.get("div_style", {"height": "400px", "width": "100%"})
 
@@ -94,7 +95,7 @@ class CustomJsonHandler(BaseHandler):
             for js_url in cdn_config["js"]:
                 js_scripts += f'<script src="{js_url}"></script>\n'
 
-        from respysive.utils import _parse_style_class
+        from respysive.utils import _parse_style_class, _script_json
 
         center_style = {"class": ["d-flex", "justify-content-center", "mx-auto"]}
         combined_kwargs = {**center_style, **kwargs}
@@ -102,7 +103,9 @@ class CustomJsonHandler(BaseHandler):
 
         div_style_str = "; ".join([f"{k.replace('_', '-')}: {v}" for k, v in div_style.items()])
 
-        config_json = json.dumps(config, indent=2)
+        config_json = _script_json(json.dumps(config, indent=2))
+        # library names such as "chart.js" are not JavaScript identifiers
+        init_name = "initialize_" + re.sub(r"\W", "_", library)
 
         if init_script:
             final_init_script = init_script
@@ -126,7 +129,7 @@ class CustomJsonHandler(BaseHandler):
                 var config = {config_json};
                 config.container = "{container_id}";
 
-                function initialize_{library.replace("-", "_")}() {{
+                function {init_name}() {{
                     try {{
                         var parsedConfig = config;
 
@@ -147,10 +150,10 @@ class CustomJsonHandler(BaseHandler):
                 // Wait for DOM and scripts to be ready
                 if (document.readyState === 'loading') {{
                     document.addEventListener('DOMContentLoaded', function() {{
-                        setTimeout(initialize_{library.replace("-", "_")}, 500);
+                        setTimeout({init_name}, 500);
                     }});
                 }} else {{
-                    setTimeout(initialize_{library.replace("-", "_")}, 500);
+                    setTimeout({init_name}, 500);
                 }}
 
             }})();

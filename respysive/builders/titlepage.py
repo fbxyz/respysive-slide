@@ -220,6 +220,28 @@ class TitlePageBuilder:
 
         page_class = f"title-page {title_page_class}".strip()
 
+        if background_image:
+            encoded_image = encode_image_to_data_uri(background_image)
+            self.slide.kwargs["data-background-image"] = encoded_image
+
+            if "data-background-size" not in self.slide.kwargs:
+                self.slide.kwargs["data-background-size"] = "cover"
+            if "data-background-position" not in self.slide.kwargs:
+                self.slide.kwargs["data-background-position"] = "center"
+            if "data-background-repeat" not in self.slide.kwargs:
+                self.slide.kwargs["data-background-repeat"] = "no-repeat"
+
+            if background_style:
+                for key, value in background_style.items():
+                    if key == "background-size":
+                        self.slide.kwargs["data-background-size"] = value
+                    elif key == "background-position":
+                        self.slide.kwargs["data-background-position"] = value
+                    elif key == "background-repeat":
+                        self.slide.kwargs["data-background-repeat"] = value
+                    elif key.startswith("data-"):
+                        self.slide.kwargs[key] = value
+
         if full_height:
             if "class" not in self.slide.kwargs:
                 self.slide.kwargs["class"] = "full-height-slide"
@@ -267,28 +289,6 @@ class TitlePageBuilder:
         else:
             row_class = "row"
             col_class_extra = ""
-
-        if background_image:
-            encoded_image = encode_image_to_data_uri(background_image)
-            self.slide.kwargs["data-background-image"] = encoded_image
-
-            if "data-background-size" not in self.slide.kwargs:
-                self.slide.kwargs["data-background-size"] = "cover"
-            if "data-background-position" not in self.slide.kwargs:
-                self.slide.kwargs["data-background-position"] = "center"
-            if "data-background-repeat" not in self.slide.kwargs:
-                self.slide.kwargs["data-background-repeat"] = "no-repeat"
-
-            if background_style:
-                for key, value in background_style.items():
-                    if key == "background-size":
-                        self.slide.kwargs["data-background-size"] = value
-                    elif key == "background-position":
-                        self.slide.kwargs["data-background-position"] = value
-                    elif key == "background-repeat":
-                        self.slide.kwargs["data-background-repeat"] = value
-                    elif key.startswith("data-"):
-                        self.slide.kwargs[key] = value
 
         return f'''
         <div class="{page_class}">

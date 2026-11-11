@@ -1,5 +1,52 @@
 # Changelog
 
+## Unreleased
+
+- Plotly charts are drawn whatever their text contains: a double quote, a line
+  break, a backslash or `</script>` in a title or a label stopped the chart,
+  and typographic apostrophes were replaced by straight ones.
+- Formulas written with `$…$` and `$$…$$` reach MathJax as written: Markdown
+  read `*` and `_` as emphasis and removed the backslash of `\\` and `\{`.
+- Amounts are no longer read as formulas: in "from $5 to $10" the dollars
+  stay text. `$…$` is a formula when no space follows the first `$` or
+  precedes the last one, and no digit follows the last one; `\$` writes a
+  dollar.
+- PowerPoint export: a Plotly chart with a log axis or a filled area stays a
+  picture instead of becoming a native chart with linear axes and plain
+  lines; missing values (NaN) no longer turn a whole chart into a picture;
+  a colour the exporter cannot read no longer puts a native chart under the
+  picture of the same chart.
+- MapLibre maps: `separatorSymbol` is applied to the legend of a horizontal
+  choropleth; popups accept property names and values holding `$`, `(` or
+  other pattern characters; a feature with `"properties": null` no longer
+  stops a data join; a circle without `value` is drawn.
+- Keyboard shortcuts work with Caps Lock on.
+- Cards: a card holding only a title no longer gives its `title-only` class to
+  the next cards, the style dictionaries passed to `add_card` are left as
+  given, and a Matplotlib figure or a Plotly dict placed in a card keeps its
+  size (the figure also keeps its proportions in the card).
+- Style values holding single quotes, such as
+  `font_family="'Open Sans', sans-serif"`, no longer break the attribute.
+- `add_custom_content` accepts library names that are not JavaScript
+  identifiers (`chart.js`), and the same `config` can be used for several
+  charts.
+- `content_types` is followed for `'image'`, `'video'` and `'altair'` when the
+  content would not be detected as such (URL without extension, specification
+  without `$schema`). A sentence that names a file is text, not an image.
+- Images given as URLs: the type is read from the path without its query
+  string (`logo.svg?v=2`), or from the server when the path has no extension,
+  and downloads time out after 60 seconds.
+- `filter_geojson_bbox` filters every geometry type by its extent; it kept all
+  lines and polygons. Features with `"properties": null` are accepted.
+- Shared GeoJSON is stored in `<script type="application/json">` elements
+  instead of hidden `<div>`: properties holding `<` or `&` are read back as
+  written.
+- `set_local_css_urls({'theme': …})` is applied, as documented.
+- `add_split_title_page(full_height=True, background_image=…)` shows the image.
+- `to_html(libraries="plotly")` accepts a single name.
+- Matplotlib figures are no longer rendered a second time as 300 dpi PNG when
+  they are added to a slide; nothing read that copy.
+
 ## 2.0.2
 
 - `shared_data_ids` accepts Plotly figures, not only dicts, and leaves their

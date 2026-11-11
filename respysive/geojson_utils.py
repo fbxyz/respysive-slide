@@ -61,7 +61,7 @@ def filter_geojson(geojson, filter_func=None, properties=None):
     if properties and not filter_func:
 
         def filter_func(feature):
-            feat_props = feature.get("properties", {})
+            feat_props = feature.get("properties") or {}
             return all(feat_props.get(key) == value for key, value in properties.items())
 
     if filter_func:
@@ -100,15 +100,36 @@ def get_feature_property_values(geojson, property_name):
 
     values = set()
     for feature in geojson.get("features", []):
-        props = feature.get("properties", {})
+        props = feature.get("properties") or {}
         if property_name in props:
             values.add(props[property_name])
 
     return sorted(values)
 
 
+def _positions(geometry):
+    """Yield the (lon, lat) positions of a GeoJSON geometry."""
+    if not geometry:
+        return
+    for part in geometry.get("geometries") or []:
+        yield from _positions(part)
+
+    def walk(coords):
+        if coords and isinstance(coords[0], (int, float)):
+            if len(coords) >= 2:
+                yield coords[0], coords[1]
+        else:
+            for item in coords or []:
+                yield from walk(item)
+
+    yield from walk(geometry.get("coordinates") or [])
+
+
 def filter_geojson_bbox(geojson, bbox):
     """Filter features by bounding box.
+
+    A feature is kept when the extent of its geometry meets the box, whatever
+    the geometry type. Features without geometry are dropped.
 
     Args:
         geojson (dict): GeoJSON FeatureCollection
@@ -124,12 +145,11 @@ def filter_geojson_bbox(geojson, bbox):
     minx, miny, maxx, maxy = bbox
 
     def in_bbox(feature):
-        geometry = feature.get("geometry", {})
-        if geometry.get("type") == "Point":
-            coords = geometry.get("coordinates", [])
-            if len(coords) >= 2:
-                lon, lat = coords[0], coords[1]
-                return minx <= lon <= maxx and miny <= lat <= maxy
-        return True
+        positions = list(_positions(feature.get("geometry")))
+        if not positions:
+            return False
+        lons = [p[0] for p in positions]
+        lats = [p[1] for p in positions]
+        return min(lons) <= maxx and max(lons) >= minx and min(lats) <= maxy and max(lats) >= miny
 
     return filter_geojson(geojson, filter_func=in_bbox)

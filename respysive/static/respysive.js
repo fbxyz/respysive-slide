@@ -254,7 +254,8 @@
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     var t = e.target;
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-    var cmd = KEYMAP[e.key];
+    // letters also work with Caps Lock or Shift
+    var cmd = KEYMAP[e.key] || KEYMAP[e.key.length === 1 ? e.key.toLowerCase() : ''];
     if (!cmd) return;
     if (overview && (cmd === 'next' && e.key === 'Enter')) cmd = 'overview';
     if (MODE === 'speaker' && cmd === 'speaker') return;
@@ -288,7 +289,8 @@
     if (/^\d+$/.test(parts[0])) {
       return { h: +parts[0], v: parts[1] ? +parts[1] : 0, f: parts[2] !== undefined ? +parts[2] : -1 };
     }
-    var target = document.getElementById(decodeURIComponent(parts[0]));
+    var target = null;
+    try { target = document.getElementById(decodeURIComponent(parts[0])); } catch (e) { /* malformed % escape */ }
     var slide = target && target.closest('.rs-slide');
     return slide ? { h: +slide.dataset.rsH, v: +slide.dataset.rsV, f: -1 } : null;
   }

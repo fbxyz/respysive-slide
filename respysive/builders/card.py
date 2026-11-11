@@ -46,12 +46,16 @@ class CardBuilder:
         approximate_height = int(approximate_width * 0.6)
 
         if isinstance(graph_content, Figure):
-            current_size = graph_content.get_size_inches()
+            # drawn smaller so that its text stays readable in a narrow card,
+            # with the same proportions; the figure gets its size back afterwards
+            width, height = graph_content.get_size_inches()
             scale_factor = min(1.0, approximate_width / 600)
-
-            new_width = max(4, current_size[0] * scale_factor)
-            new_height = max(3, current_size[1] * scale_factor)
-            graph_content.set_size_inches(new_width, new_height)
+            scale_factor = min(1.0, max(scale_factor, 4 / width, 3 / height))
+            graph_content.set_size_inches(width * scale_factor, height * scale_factor)
+            try:
+                return self.content_detector.detect_and_handle(graph_content)
+            finally:
+                graph_content.set_size_inches(width, height)
 
         elif isinstance(graph_content, (str, dict)):
             if isinstance(graph_content, str):
@@ -63,9 +67,10 @@ class CardBuilder:
                         graph_content = json.dumps(plotly_config)
                 except (json.JSONDecodeError, KeyError):
                     pass
-            elif isinstance(graph_content, dict) and "layout" in graph_content:
-                graph_content["layout"]["width"] = approximate_width
-                graph_content["layout"]["height"] = approximate_height
+            elif isinstance(graph_content, dict) and isinstance(graph_content.get("layout"), dict):
+                # a copy: the caller's figure keeps its size
+                layout = {**graph_content["layout"], "width": approximate_width, "height": approximate_height}
+                graph_content = {**graph_content, "layout": layout}
 
         return self.content_detector.detect_and_handle(graph_content)
 
@@ -84,6 +89,8 @@ class CardBuilder:
 
         if styles is None:
             styles = [{"class": "bg-info"}] * len(cards)
+        # copies: classes are added below, and the caller may reuse its dicts
+        styles = [dict(style or {}) for style in styles]
 
         num_cards = len(cards)
         if num_cards == 1:
@@ -99,14 +106,12 @@ class CardBuilder:
 
         cards_html = ""
         for i, (card, style) in enumerate(zip(cards, styles, strict=False)):
-            if "class" not in style:
-                style["class"] = []
-            elif isinstance(style["class"], str):
-                style["class"] = [style["class"]]
+            classes = style.get("class") or []
+            style["class"] = classes.split() if isinstance(classes, str) else list(classes)
 
-            if "card" not in " ".join(style["class"]):
+            if "card" not in style["class"]:
                 style["class"].append("card")
-            if "h-100" not in " ".join(style["class"]):
+            if "h-100" not in style["class"]:
                 style["class"].append("h-100")
 
             has_only_title = (
@@ -116,7 +121,7 @@ class CardBuilder:
                 and "graph" not in card
                 and "video" not in card
             )
-            if has_only_title and "title-only" not in " ".join(style["class"]):
+            if has_only_title and "title-only" not in style["class"]:
                 style["class"].append("title-only")
 
             s = _parse_style_class(style)
@@ -130,7 +135,7 @@ class CardBuilder:
                     if not image_src.startswith("data:"):
                         image_src = encode_image_to_data_uri(image_src)
 
-                    image_style = card.get("image_style", {})
+                    image_style = dict(card.get("image_style") or {})
 
                     if "max-width" not in image_style and "width" not in image_style:
                         image_style["width"] = "100%"
@@ -145,7 +150,7 @@ class CardBuilder:
                     wrapper_style = f"overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; max-height: {wrapper_height};"
                     image_html = f'<div style="{wrapper_style}"><img src="{image_src}" class="card-img-top" alt="" {image_style_attr}></div>'
                 elif key == "video":
-                    video_style = card.get("video_style", {})
+                    video_style = dict(card.get("video_style") or {})
                     if "max-width" not in video_style and "width" not in video_style:
                         video_style["width"] = "100%"
                     if "max-height" not in video_style and "height" not in video_style:

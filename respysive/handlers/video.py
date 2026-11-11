@@ -40,11 +40,12 @@ class VideoHandler(BaseHandler):
         if os.path.isfile(content):
             return os.path.splitext(content)[1].lower() in video_extensions
 
-        if re.match(
+        # a URL holds no whitespace: a sentence naming a file is text
+        if not re.search(r"\s", content.strip()) and re.match(
             r"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)",
             content,
         ):
-            return re.search(r"\.(mp4|webm|ogg|ogv|mov|m4v)", content, re.IGNORECASE) is not None
+            return re.search(r"\.(mp4|webm|ogg|ogv|mov|m4v)\b", content, re.IGNORECASE) is not None
 
         return False
 
@@ -63,7 +64,7 @@ class VideoHandler(BaseHandler):
         Raises:
             ValueError: If content is not a valid video path or URL.
         """
-        if not isinstance(content, str) or not self.can_handle(content):
+        if not isinstance(content, str) or not (forced or self.can_handle(content)):
             raise ValueError("Content must be a valid video file path or URL")
 
         center_style = {"class": ["d-flex", "justify-content-center", "mx-auto"]}

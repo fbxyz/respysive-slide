@@ -9,6 +9,7 @@ maps, images and equations.
 
 import base64
 import io
+import math
 from pathlib import Path
 
 from .base import BaseExporter
@@ -286,13 +287,23 @@ def _css_rgb(color):
     if not isinstance(color, str):
         return None
     color = color.strip()
-    if color.startswith("#") and len(color) in (4, 7):
-        hex_digits = color[1:] if len(color) == 7 else "".join(c * 2 for c in color[1:])
-        return RGBColor.from_string(hex_digits.upper())
-    if color.startswith("rgb"):
-        parts = color[color.index("(") + 1 : color.index(")")].replace("/", " ").replace(",", " ").split()
-        return RGBColor(*(round(float(v)) for v in parts[:3]))
+    try:
+        if color.startswith("#") and len(color) in (4, 7):
+            hex_digits = color[1:] if len(color) == 7 else "".join(c * 2 for c in color[1:])
+            return RGBColor.from_string(hex_digits.upper())
+        if color.startswith("rgb"):
+            parts = color[color.index("(") + 1 : color.index(")")].replace("/", " ").replace(",", " ").split()
+            return RGBColor(*(round(float(v)) for v in parts[:3]))
+    except ValueError:
+        pass  # a notation not read here (percentages…): the chart keeps PowerPoint's colour
     return None
+
+
+def _number(value):
+    """Chart value as written in the workbook: missing for NaN and infinities."""
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
+    return value
 
 
 def _categories(series, axis):
@@ -306,9 +317,13 @@ def _categories(series, axis):
 
 def _chart(slide, item):
     """Native PowerPoint chart from a Plotly figure, or its picture on failure."""
+    shapes = len(slide.shapes)
     try:
         _native_chart(slide, item["chart"], item["box"])
     except (ValueError, TypeError, KeyError, IndexError):
+        # a chart added before the failure would show under its picture
+        for shape in list(slide.shapes)[shapes:]:
+            shape._element.getparent().remove(shape._element)
         _picture(slide, item)
 
 
@@ -321,7 +336,7 @@ def _native_chart(slide, spec, box):
     if kind == "pie":
         data = CategoryChartData()
         data.categories = spec["labels"]
-        data.add_series(series[0]["name"], spec["values"])
+        data.add_series(series[0]["name"], [_number(v) for v in spec["values"]])
         chart_type = XL_CHART_TYPE.PIE
     elif kind == "bar":
         horizontal = spec["horizontal"]
@@ -331,7 +346,7 @@ def _native_chart(slide, spec, box):
         data.categories = categories
         for s in series:
             values = dict(zip((str(c) for c in s[category_axis]), s[value_axis], strict=False))
-            data.add_series(s["name"], [values.get(c) for c in categories])
+            data.add_series(s["name"], [_number(values.get(c)) for c in categories])
         stacked = spec["stacked"]
         chart_type = {
             (False, False): XL_CHART_TYPE.COLUMN_CLUSTERED,
@@ -347,7 +362,8 @@ def _native_chart(slide, spec, box):
             for s in series:
                 points = data.add_series(s["name"])
                 for x, y in zip(s["x"], s["y"], strict=False):
-                    points.add_data_point(x, y)
+                    if _number(x) is not None:
+                        points.add_data_point(x, _number(y))
             if not lines:
                 chart_type = XL_CHART_TYPE.XY_SCATTER
             else:
@@ -358,7 +374,7 @@ def _native_chart(slide, spec, box):
             data.categories = categories
             for s in series:
                 values = dict(zip((str(c) for c in s["x"]), s["y"], strict=False))
-                data.add_series(s["name"], [values.get(c) for c in categories])
+                data.add_series(s["name"], [_number(values.get(c)) for c in categories])
             chart_type = XL_CHART_TYPE.LINE_MARKERS if markers else XL_CHART_TYPE.LINE
 
     frame = slide.shapes.add_chart(chart_type, _emu(box["x"]), _emu(box["y"]), _emu(box["w"]), _emu(box["h"]), data)

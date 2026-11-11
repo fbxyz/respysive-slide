@@ -106,30 +106,6 @@ class Slide:
                 return type(handler).__name__
         return "TextHandler"
 
-    @staticmethod
-    def _capture_matplotlib_bytes(fig):
-        """Eagerly capture PNG bytes from a Matplotlib figure.
-
-        Args:
-            fig: Matplotlib Figure object.
-
-        Returns:
-            bytes or None: PNG bytes if fig is a Matplotlib Figure, None otherwise.
-        """
-        try:
-            from matplotlib.figure import Figure
-
-            if isinstance(fig, Figure):
-                import io
-
-                buf = io.BytesIO()
-                fig.savefig(buf, format="png", dpi=300, bbox_inches="tight")
-                buf.seek(0)
-                return buf.read()
-        except ImportError:
-            pass
-        return None
-
     def _ensure_shared_data_available(self, shared_data_id: str):
         """Record a shared data id that the deck must provide.
 
@@ -441,7 +417,7 @@ class Slide:
             ...             ]
             ...         }
             ...     },
-            ...     popup="<b>{name}</b><br>Population: {population:,} people"
+            ...     popup="<b>{name}</b><br>Population: {population} people"
             ... )
         """
         if columns is None:
@@ -485,7 +461,7 @@ class Slide:
             openstreetmap (bool): Use OpenStreetMap instead of default style
             scale (bool): Show scale control
             navigation (bool): Show navigation controls
-            popup (str): Popup HTML template with variables {{property_name}}
+            popup (str): Popup HTML template with variables {property_name}
             columns (list): Bootstrap layout [12]
             styles (list): CSS styles and Bootstrap classes
 
@@ -641,10 +617,6 @@ class Slide:
                 "dimensions": dimensions[i] if dimensions and i < len(dimensions) else None,
                 "fragment": _fragment_class(fragment, i) or None,
             }
-            if detected_type == "MatplotlibHandler":
-                png = self._capture_matplotlib_bytes(content[i])
-                if png:
-                    element_record["png_bytes"] = png
             row_record["elements"].append(element_record)
         self._export_data.append(row_record)
 
@@ -721,12 +693,7 @@ class Slide:
         """
         cards_record = {"type": "cards", "cards": [], "styles": styles, "fragment": fragment}
         for card in cards:
-            card_record = dict(card)
-            if "graph" in card:
-                png = self._capture_matplotlib_bytes(card["graph"])
-                if png:
-                    card_record["graph_png_bytes"] = png
-            cards_record["cards"].append(card_record)
+            cards_record["cards"].append(dict(card))
         self._export_data.append(cards_record)
 
         self.content += self._card_builder.build_cards(cards, styles, fragment=fragment)
@@ -833,9 +800,6 @@ class Slide:
             "custom_content_type": self._detect_content_type(custom_content),
             "title_styles": title_styles,
         }
-        png = self._capture_matplotlib_bytes(custom_content)
-        if png:
-            split_record["custom_png_bytes"] = png
         self._export_data.append(split_record)
 
         self.content += self._titlepage_builder.build_split_title_page(

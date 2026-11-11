@@ -61,7 +61,7 @@ class AltairHandler(BaseHandler):
         Raises:
             ValueError: If content is not a valid Vega-Lite specification.
         """
-        if not self.can_handle(content):
+        if not forced and not self.can_handle(content):
             raise ValueError("Content is not a valid Altair chart")
 
         if _is_altair_chart(content):

@@ -2,8 +2,35 @@
 
 import base64
 import re
+from html import escape
+from urllib.parse import urlparse
 
 import requests
+
+_REQUEST_TIMEOUT = 60  # seconds, for images and videos given as URLs
+
+_IMAGE_MIME_TYPES = {
+    ".svg": "image/svg+xml",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".apng": "image/apng",
+    ".gif": "image/gif",
+    ".avif": "image/avif",
+    ".webp": "image/webp",
+    ".bmp": "image/bmp",
+    ".tif": "image/tiff",
+    ".tiff": "image/tiff",
+}
+
+
+def _script_json(text: str) -> str:
+    """Make JSON safe inside a ``<script>`` element.
+
+    ``</script>`` or ``<!--`` in a string would end or corrupt the script.
+    ``<`` only occurs inside JSON strings, where its unicode escape means the same.
+    """
+    return text.replace("</", "\\u003c/").replace("<!--", "\\u003c!--")
 
 
 def encode_image_to_data_uri(image_path: str) -> str:
@@ -19,7 +46,7 @@ def encode_image_to_data_uri(image_path: str) -> str:
         return image_path
     if image_path.startswith(("http://", "https://")):
         headers = {"User-Agent": "respysive-slide/1.0 (Python; https://github.com/fbxyz/respysive-slide)"}
-        response = requests.get(image_path, headers=headers)
+        response = requests.get(image_path, headers=headers, timeout=_REQUEST_TIMEOUT)
         response.raise_for_status()
 
         content_type = response.headers.get("content-type", "")
@@ -29,24 +56,15 @@ def encode_image_to_data_uri(image_path: str) -> str:
             )
 
         image_data = response.content
+        # the extension of the path, without the query string; else what the server says
+        path = urlparse(image_path).path.lower()
+        suffix = "." + path.rsplit(".", 1)[-1] if "." in path else ""
+        mime_type = _IMAGE_MIME_TYPES.get(suffix) or content_type.split(";")[0].strip()
     else:
         with open(image_path, "rb") as f:
             image_data = f.read()
-
-    if image_path.lower().endswith(".svg"):
-        mime_type = "image/svg+xml"
-    elif image_path.lower().endswith((".jpg", ".jpeg")):
-        mime_type = "image/jpeg"
-    elif image_path.lower().endswith(".png"):
-        mime_type = "image/png"
-    elif image_path.lower().endswith(".gif"):
-        mime_type = "image/gif"
-    elif image_path.lower().endswith(".avif"):
-        mime_type = "image/avif"
-    elif image_path.lower().endswith(".webp"):
-        mime_type = "image/webp"
-    else:
-        mime_type = "image/png"
+        suffix = "." + image_path.lower().rsplit(".", 1)[-1] if "." in image_path else ""
+        mime_type = _IMAGE_MIME_TYPES.get(suffix, "image/png")
 
     image_base64 = base64.b64encode(image_data).decode("utf-8")
     return f"data:{mime_type};base64,{image_base64}"
@@ -69,7 +87,7 @@ def encode_video_to_data_uri(video_path: str) -> str:
     """
     if video_path.startswith(("http://", "https://")):
         headers = {"User-Agent": "respysive-slide/1.0 (Python; https://github.com/fbxyz/respysive-slide)"}
-        response = requests.get(video_path, headers=headers)
+        response = requests.get(video_path, headers=headers, timeout=_REQUEST_TIMEOUT)
         response.raise_for_status()
         video_data = response.content
     else:
@@ -138,6 +156,8 @@ def _parse_style_class(style: dict):
 
         result_parts = []
         if style_str:
+            # values such as font-family: 'Open Sans' must not close the attribute
+            style_str = style_str.replace("'", "&#39;")
             result_parts.append(f"style='{style_str}'")
         if class_str:
             result_parts.append(class_str)
@@ -169,6 +189,19 @@ def add_list_classes(text: str, text_size: str = "85%") -> str:
     return text
 
 
+# $…$ is a formula when the first $ is followed by a character, and the last
+# one follows a character and precedes no digit (the rule of pandoc). So
+# "from $5 to $10" stays text, as does an escaped \\$.
+_DISPLAY_MATH = re.compile(r"(?<!\\)\$\$(.*?)(?<!\\)\$\$", re.DOTALL)
+_INLINE_MATH = re.compile(r"(?<![\\$])\$(?![\s$])((?:\\.|[^$\\\n])*?)(?<![\s\\])\$(?!\d)")
+
+
+def _dollars_to_mathjax(text: str) -> str:
+    """Rewrite ``$$…$$`` as ``\\[…\\]`` and ``$…$`` as ``\\(…\\)``."""
+    text = _DISPLAY_MATH.sub(lambda m: f"\\[{m.group(1)}\\]", text)
+    return _INLINE_MATH.sub(lambda m: f"\\({m.group(1)}\\)", text)
+
+
 def process_markdown_with_latex(text: str) -> str:
     """Process markdown text with LaTeX math support.
 
@@ -192,7 +225,7 @@ def process_markdown_with_latex(text: str) -> str:
         def protect_formula(match):
             """Replace formula with unique placeholder."""
             placeholder = f"MATH_{uuid.uuid4().hex}_MATH"
-            protected_formulas[placeholder] = match.group(0)
+            protected_formulas[placeholder] = escape(match.group(0), quote=False)
             return placeholder
 
         def restore_formulas(html):
@@ -202,11 +235,12 @@ def process_markdown_with_latex(text: str) -> str:
             return html
 
         if not is_already_html:
+            # formulas are set aside: Markdown would read their * and _ as
+            # emphasis and drop the backslash of \\ or \{
+            text = _dollars_to_mathjax(text)
             text = re.sub(r"\\\[.*?\\\]", protect_formula, text, flags=re.DOTALL)
             text = re.sub(r"\\\(.*?\\\)", protect_formula, text)
-
-            text = re.sub(r"\$\$(.*?)\$\$", r"\\\\[\1\\\\]", text, flags=re.DOTALL)
-            text = re.sub(r"\$(.*?)\$", r"\\\\(\1\\\\)", text)
+            text = text.replace("\\$", "$")  # an escaped dollar is a dollar
 
             md = markdown.Markdown(extensions=["extra", "codehilite"])
             html = md.convert(text)
@@ -214,14 +248,10 @@ def process_markdown_with_latex(text: str) -> str:
             html = restore_formulas(html)
             return html
         else:
-            text = re.sub(r"\$\$(.*?)\$\$", r"\\[\1\\]", text, flags=re.DOTALL)
-            text = re.sub(r"\$(.*?)\$", r"\\(\1\\)", text)
-            return text
+            return _dollars_to_mathjax(text)
 
     except ImportError:
-        text = re.sub(r"\$\$(.*?)\$\$", r"\\\\[\1\\\\]", text, flags=re.DOTALL)
-        text = re.sub(r"\$(.*?)\$", r"\\\\(\1\\\\)", text)
-        return text.replace("\n", "<br>")
+        return _dollars_to_mathjax(text).replace("\n", "<br>")
 
 
 def _fragment_class(spec, index=None):

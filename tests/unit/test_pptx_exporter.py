@@ -126,6 +126,8 @@ BARS = {
 PIE = {"data": [{"type": "pie", "labels": ["A", "B", "C"], "values": [30, 50, 20]}], "layout": {}}
 HEATMAP = {"data": [{"type": "heatmap", "z": [[1, 2], [3, 4]]}], "layout": {}}
 BUBBLES = {"data": [{"type": "scatter", "mode": "markers", "x": [1, 2], "y": [3, 4], "marker": {"size": [10, 40]}}]}
+LOG = {"data": [{"type": "scatter", "x": [1, 2], "y": [10, 1000]}], "layout": {"yaxis": {"type": "log"}}}
+AREA = {"data": [{"type": "scatter", "x": [1, 2], "y": [3, 4], "fill": "tozeroy"}], "layout": {}}
 
 
 def test_plotly_bars_become_native_chart(plotly_deck):
@@ -160,4 +162,69 @@ def test_unsupported_or_disabled_charts_are_pictures(plotly_deck):
 
     picture, chart = [MSO_SHAPE_TYPE.PICTURE], [MSO_SHAPE_TYPE.CHART]
     assert kinds(_export_offline(plotly_deck(HEATMAP, BUBBLES, BARS))) == [picture, picture, chart]
+    # linear axes and plain lines only: a log axis or a filled area stays as drawn
+    assert kinds(_export_offline(plotly_deck(LOG, AREA))) == [picture, picture]
     assert kinds(_export_offline(plotly_deck(BARS), native_charts=False)) == [picture]
+
+
+def _spec(kind, series, **options):
+    spec = {
+        "type": kind,
+        "title": "",
+        "font": {"family": "Arial", "size": 12, "color": "#444444"},
+        "legend": False,
+        "xTitle": "",
+        "yTitle": "",
+        "xRange": None,
+        "yRange": None,
+        "series": series,
+    }
+    return dict(spec, **options)
+
+
+def _blank_slide():
+    pptx = pytest.importorskip("pptx")
+    prs = pptx.Presentation()
+    return prs.slides.add_slide(prs.slide_layouts[6])
+
+
+def test_missing_values_stay_in_a_native_chart():
+    from respysive.exporters.pptx_exporter import _native_chart
+
+    slide = _blank_slide()
+    series = [
+        {"name": "a", "x": ["A", "B"], "y": [1, float("nan")], "color": "#ff0000", "markerSize": None, "mode": ""}
+    ]
+    _native_chart(slide, _spec("bar", series, horizontal=False, stacked=False), {"x": 0, "y": 0, "w": 400, "h": 300})
+    assert list(slide.shapes[0].chart.plots[0].series[0].values) == [1, None]
+
+
+def test_unread_colour_keeps_the_native_chart():
+    from respysive.exporters.pptx_exporter import _chart
+
+    slide = _blank_slide()
+    series = [
+        {"name": "a", "x": ["A"], "y": [1], "color": "rgb(100%, 0%, 0%)", "markerSize": None, "mode": ""},
+    ]
+    item = {"chart": _spec("bar", series, horizontal=False, stacked=False), "box": {"x": 0, "y": 0, "w": 400, "h": 300}}
+    _chart(slide, item)
+    assert [shape.has_chart for shape in slide.shapes] == [True]
+
+
+def test_failed_native_chart_leaves_only_its_picture():
+    import base64
+    import io
+
+    from PIL import Image
+
+    from respysive.exporters.pptx_exporter import _chart
+
+    buffer = io.BytesIO()
+    Image.new("RGB", (4, 3)).save(buffer, format="PNG")
+    slide = _blank_slide()
+    series = [{"name": "a", "x": ["A"], "y": [1], "color": None, "markerSize": None, "mode": ""}]
+    # incomplete axis bounds: the failure comes after the chart is added
+    spec = _spec("bar", series, horizontal=False, stacked=False, yRange={"min": 0})
+    item = {"chart": spec, "box": {"x": 0, "y": 0, "w": 400, "h": 300}, "png": base64.b64encode(buffer.getvalue())}
+    _chart(slide, item)
+    assert [shape.has_chart for shape in slide.shapes] == [False]

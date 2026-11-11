@@ -9,7 +9,13 @@ from bs4 import BeautifulSoup
 from matplotlib.figure import Figure
 
 from respysive.errors import validate_heading_tag, validate_text_tag
-from respysive.utils import _parse_style_class, _video_mime_type, encode_image_to_data_uri, encode_video_to_data_uri
+from respysive.utils import (
+    _parse_style_class,
+    _script_json,
+    _video_mime_type,
+    encode_image_to_data_uri,
+    encode_video_to_data_uri,
+)
 
 # Plotly traces drawn on MapLibre tiles, whose controls need the MapLibre stylesheet
 _TILE_MAP_TRACES = {"scattermap", "choroplethmap", "densitymap"}
@@ -82,8 +88,10 @@ class Content:
 
         self.shared_data[data_id] = {"data": json_str, "type": data_type}
 
+        # a JSON script keeps the text as written: a <div> would parse "<" and "&" as HTML
         self.content += (
-            f'<div id="shared-data-{data_id}" style="display:none;" data-type="{data_type}">{json_str}</div>'
+            f'<script type="application/json" id="shared-data-{data_id}" data-type="{data_type}">'
+            f"{_script_json(json_str)}</script>"
         )
 
     def add_heading(self, text: str, tag: str = "h3", icon: str = None, **kwargs):
@@ -387,7 +395,7 @@ class Content:
         if shared_data_id:
             use_local_data = shared_data_id in self.shared_data
 
-            plotly_data_json = json.dumps(_figure_without_geojson(plotly_data)) if plotly_data else "null"
+            plotly_data_json = _script_json(json.dumps(_figure_without_geojson(plotly_data))) if plotly_data else "null"
 
             data_element_id = f"shared-data-{shared_data_id}" if use_local_data else shared_data_id
 
@@ -476,26 +484,12 @@ class Content:
             else:
                 raise ValueError("plotly_data must be a Figure object, dictionary or JSON string")
 
-            json_escaped = json_str.replace("'", "\u2019").replace('"', '\\"')
-
             html_content = f"""
         <div {s} id='{chart_id}' style='width:{chart_width}; height:{chart_height};'></div>
         <script type="text/javascript">
             (function() {{
-                // Initialize global cache for parsed JSON data
-                if (!window._respysive_cache) {{
-                    window._respysive_cache = {{}};
-                }}
-
                 try {{
-                    var plotlyData = "{json_escaped}";
-
-                    // Use cached figure if available, otherwise parse and cache
-                    var cacheKey = 'plotly_{chart_id}';
-                    if (!window._respysive_cache[cacheKey]) {{
-                        window._respysive_cache[cacheKey] = JSON.parse(plotlyData.replace(/\\u2019/g, "'").replace(/\\\\"/g, '"'));
-                    }}
-                    var figure = window._respysive_cache[cacheKey];
+                    var figure = {_script_json(json_str)};
 
                     if (typeof Plotly !== 'undefined') {{
                         var config = {{
@@ -546,7 +540,7 @@ class Content:
         chart_id = "chart-" + str(uuid.uuid4())
         self.content += f"""<div {s} id='{chart_id}'></div>
         <script>var opt = {{renderer: "svg", config: window.respysiveTheme && window.respysiveTheme.vega}};
-        vegaEmbed("#{chart_id}", {json} , opt);</script>"""
+        vegaEmbed("#{chart_id}", {_script_json(json)} , opt);</script>"""
 
     def add_div(self, div: str, **kwargs):
         """Add raw HTML content wrapped in a div element.

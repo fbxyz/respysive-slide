@@ -190,7 +190,11 @@
     // per-point sizes or colours (bubbles, colour scales) have no native equivalent
     const perPoint = (v) => Array.isArray(v) || ArrayBuffer.isView(v);
     const varying = type !== 'pie' && traces.some((t) => t.marker && (perPoint(t.marker.size) || perPoint(t.marker.color)));
-    if (!supported || !simple || varying || points === 0 || points > 1000) return null;
+    // PowerPoint charts drawn here have linear axes and plain lines: log axes
+    // and filled areas would show something else than the slide
+    const log = type !== 'pie' && [layout.xaxis, layout.yaxis].some((axis) => axis && axis.type === 'log');
+    const filled = type === 'scatter' && traces.some((t) => t.fill && t.fill !== 'none');
+    if (!supported || !simple || varying || log || filled || points === 0 || points > 1000) return null;
     if (type === 'pie' && traces.length > 1) return null;
 
     // titles come from the user layout: Plotly fills empty ones in

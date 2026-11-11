@@ -16,9 +16,9 @@ from .assets import (
     plotly_geo_assets_script,
 )
 from .container import OVERFLOW_MODES
-from .dependencies import CSS_URLS, JS_URLS, get_theme_url
+from .dependencies import CSS_URLS, JS_URLS, LOCAL_CSS_URLS, get_theme_url
 from .themes import THEMES
-from .utils import _dedupe_svg_ids
+from .utils import _dedupe_svg_ids, _script_json
 
 _STATIC_DIR = Path(__file__).parent / "static"
 
@@ -437,7 +437,7 @@ class Presentation:
         elif libraries == "all":
             names = list(LIBRARIES)
         else:
-            names = list(libraries)
+            names = [libraries] if isinstance(libraries, str) else list(libraries)
         if "bootstrap" not in names:
             names.insert(0, "bootstrap")  # every slide layout relies on it
         lib_css, lib_js = library_urls(names)
@@ -448,7 +448,8 @@ class Presentation:
             theme_css = themes.theme_css(theme)
             theme_js = f"<script>\n{themes.theme_script(theme)}\n</script>"
             theme = THEMES[theme]["base"]
-        theme_url = custom_theme or (get_theme_url(theme) if theme else None)
+        # set_local_css_urls({'theme': ...}) replaces the Reveal.js stylesheet of the theme
+        theme_url = custom_theme or ((LOCAL_CSS_URLS.get("theme") or get_theme_url(theme)) if theme else None)
         if theme_url and offline and not _is_remote(theme_url) and Path(theme_url).exists():
             css_links_html += f"<style>\n{inline_css(theme_url)}\n</style>\n"
         elif theme_url:
@@ -466,7 +467,11 @@ class Presentation:
 
         global_geojson_html = ""
         for div_id, json_str in self._global_geojson.items():
-            global_geojson_html += f'<div id="{div_id}" style="display:none;">{json_str}</div>\n'
+            # a JSON script keeps the text as written: a <div> would parse "<" and "&" as HTML
+            global_geojson_html += (
+                f'<script type="application/json" id="{html.escape(str(div_id), quote=True)}">'
+                f"{_script_json(json_str)}</script>\n"
+            )
 
         runtime_config = json.dumps(
             {

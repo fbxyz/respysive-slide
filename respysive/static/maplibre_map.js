@@ -41,6 +41,7 @@ function joinDataWithGeometry(geojsonData, dataToJoin, joinKey, valueKey) {
     }
 
     geojsonData.features.forEach(function(feature) {
+        if (!feature.properties) feature.properties = {};
         var featureKey = feature.properties[joinKey];
         if (featureKey !== undefined && dataIndex[featureKey]) {
             Object.assign(feature.properties, dataIndex[featureKey]);
@@ -302,7 +303,7 @@ function createLegend() {
                 // Format number with thousands separator if enabled
                 var displayValue = value;
                 if (useThousandsSeparator && typeof value === 'number' && value >= 1000) {
-                    displayValue = value.toLocaleString('fr-FR').replace(/\\s/g, separator);
+                    displayValue = value.toLocaleString('fr-FR').replace(/\s/g, separator);
                 }
 
                 label.textContent = displayValue;
@@ -528,7 +529,7 @@ map.on('load', function() {
             var layerId = 'circle-layer-' + index;
 
             var coordinates = circle.coordinates;
-            var value = circle.value;
+            var value = circle.value || 1;  // as in the legend statistics
 
             // Check that coordinates are properly resolved from cache
             if (!coordinates) {
@@ -664,8 +665,8 @@ map.on('load', function() {
 
                 // Fill {property} placeholders
                 Object.keys(properties).forEach(function(key) {
-                    var regex = new RegExp('{' + key + '}', 'g');
-                    popupContent = popupContent.replace(regex, properties[key]);
+                    // split/join: property names and values are plain text, not patterns
+                    popupContent = popupContent.split('{' + key + '}').join(properties[key]);
                 });
 
                 new maplibregl.Popup()
