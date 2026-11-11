@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.0.3
 
 - Plotly charts are drawn whatever their text contains: a double quote, a line
   break, a backslash or `</script>` in a title or a label stopped the chart,

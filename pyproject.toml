@@ -11,7 +11,7 @@ dependencies = [
 ]
 
 readme = "README.md"
-version = "2.0.2"
+version = "2.0.3"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 keywords = ["slide", "presentation", "Bootstrap", "plotly", "altair", "pandas", "maps"]
